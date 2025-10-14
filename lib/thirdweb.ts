@@ -137,6 +137,45 @@ export async function updateKegMetadata(
 }
 
 /**
+ * Transfer keg NFTs from one user to another
+ * In live mode: Uses Thirdweb SDK to transfer tokens
+ * In mock mode: Returns simulated transaction hash
+ */
+export async function transferKegNFTs(
+  kegIds: string[],
+  fromUserId: string,
+  toUserId: string
+): Promise<string> {
+  if (USE_LIVE_BLOCKCHAIN) {
+    try {
+      // TODO: Implement real Thirdweb SDK integration
+      // This would involve:
+      // 1. Getting wallet addresses for both users
+      // 2. Using gasless transactions via thirdweb Engine
+      // 3. Batch transferring all NFTs
+      // const { ThirdwebSDK } = await import('@thirdweb-dev/sdk');
+      // const sdk = new ThirdwebSDK("base", { clientId: THIRDWEB_CLIENT_ID });
+      // const contract = await sdk.getContract(KEG_CONTRACT_ADDRESS);
+      // 
+      // for (const kegId of kegIds) {
+      //   await contract.erc721.transfer(toWalletAddress, kegId);
+      // }
+      
+      throw new Error('Live blockchain integration not yet implemented');
+    } catch (error) {
+      throw new Error(`Failed to transfer kegs: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  } else {
+    // Mock implementation - generate realistic-looking tx hash
+    await simulateDelay(800);
+    const mockTxHash = `0x${Math.random().toString(16).substring(2)}${Date.now().toString(16)}`;
+    console.log('Mock: Transferred kegs:', kegIds, 'from', fromUserId, 'to', toUserId);
+    console.log('Mock transaction hash:', mockTxHash);
+    return mockTxHash;
+  }
+}
+
+/**
  * Verify that a token ID exists and is valid
  */
 export async function verifyKegToken(tokenId: string): Promise<boolean> {

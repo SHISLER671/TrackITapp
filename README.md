@@ -10,6 +10,9 @@ The Beer Keg Tracker reduces keg loss from the industry average of 18% to under 
 
 - **QR Code Tracking**: Each keg gets a unique QR code linked to blockchain records
 - **Real-time Monitoring**: Track keg location, status, and fill levels
+- **Fast Delivery System**: 15-second delivery acceptance with blockchain receipts (see `DELIVERY_SYSTEM.md`)
+- **Driver Workflow**: Scan-and-go workflow with minimal app time (see `DRIVER_QUICK_START.md`)
+- **Accounting Integration**: One-click CSV export for reconciliation (see `MANAGER_QUICK_START.md`)
 - **POS Integration**: Automatic sync with Revel, Square, and Toast POS systems
 - **Variance Analysis**: AI-powered investigation reports for discrepancies
 - **Role-based Access**: Separate dashboards for brewers, drivers, and restaurant managers

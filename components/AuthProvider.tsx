@@ -28,10 +28,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session:', session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        console.log('User authenticated:', session.user.id);
         fetchUserRole(session.user.id);
       } else {
+        console.log('No user session');
         setLoading(false);
       }
     });
@@ -39,11 +42,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state change:', event, session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        console.log('User authenticated via state change:', session.user.id);
         fetchUserRole(session.user.id);
       } else {
+        console.log('No user session via state change');
         setUserRole(null);
         setLoading(false);
       }
@@ -64,6 +70,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUserRole(data);
     } catch (error) {
       console.error('Error fetching user role:', error);
+      console.error('User ID:', userId);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       setUserRole(null);
     } finally {
       setLoading(false);

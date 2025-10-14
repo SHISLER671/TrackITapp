@@ -22,6 +22,8 @@ export default function NavBar() {
       return [
         { href: '/dashboard/brewer', label: 'Dashboard' },
         { href: '/kegs/new', label: 'New Keg' },
+        { href: '/kegs/batch', label: 'Batch' },
+        { href: '/accounting', label: 'Accounting' },
         { href: '/reports', label: 'Reports' },
         { href: '/scan', label: 'Scan' },
       ];
@@ -31,6 +33,7 @@ export default function NavBar() {
       return [
         { href: '/dashboard/driver', label: 'Dashboard' },
         { href: '/scan', label: 'Scan' },
+        { href: '/deliveries/new', label: 'Create Delivery' },
       ];
     }
 
@@ -38,6 +41,7 @@ export default function NavBar() {
       return [
         { href: '/dashboard/restaurant', label: 'Dashboard' },
         { href: '/scan', label: 'Scan' },
+        { href: '/accounting', label: 'Accounting' },
         { href: '/reports', label: 'Reports' },
       ];
     }

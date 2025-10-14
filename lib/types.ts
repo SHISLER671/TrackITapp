@@ -6,6 +6,8 @@ export type UserRole = 'BREWER' | 'DRIVER' | 'RESTAURANT_MANAGER';
 
 export type VarianceStatus = 'NORMAL' | 'WARNING' | 'CRITICAL';
 
+export type DeliveryStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED';
+
 export type BeerStyle = 
   | 'IPA' 
   | 'Pale Ale' 
@@ -83,6 +85,48 @@ export interface VarianceReport {
   created_at: string;
   resolved: boolean;
   resolved_at: string | null;
+}
+
+export interface Delivery {
+  id: string;
+  driver_id: string;
+  restaurant_id: string;
+  brewery_id: string;
+  keg_ids: string[];
+  status: DeliveryStatus;
+  driver_signature: string | null;
+  manager_signature: string | null;
+  blockchain_tx_hash: string | null;
+  created_at: string;
+  accepted_at: string | null;
+  receipt_pdf_url: string | null;
+  receipt_sent_at: string | null;
+  deposit_amount: number | null;
+  notes: string | null;
+}
+
+export interface DeliveryItem {
+  id: string;
+  delivery_id: string;
+  keg_id: string;
+  keg_name: string;
+  keg_type: string;
+  keg_size: KegSize;
+  deposit_value: number;
+  created_at: string;
+}
+
+export interface AccountingExport {
+  id: string;
+  exported_by: string;
+  start_date: string;
+  end_date: string;
+  restaurant_id: string | null;
+  delivery_count: number;
+  total_kegs: number;
+  total_deposit: number;
+  file_url: string | null;
+  created_at: string;
 }
 
 export interface AIAnalysisResult {
@@ -167,5 +211,25 @@ export function parseQRCode(qrString: string): QRCodeData | null {
 
 export function formatQRCode(contract: string, tokenId: string): string {
   return `keg:${contract}:${tokenId}`;
+}
+
+// Helper function to calculate keg deposit value based on size
+export function calculateKegDeposit(kegSize: KegSize): number {
+  const depositMap: Record<KegSize, number> = {
+    '1/6BBL': 30.00,
+    '1/4BBL': 30.00,
+    '1/2BBL': 30.00,
+    'Pony': 30.00,
+    'Cornelius': 30.00,
+  };
+  
+  return depositMap[kegSize];
+}
+
+// Form data types for deliveries
+export interface CreateDeliveryFormData {
+  restaurant_id: string;
+  keg_ids: string[];
+  notes?: string;
 }
 

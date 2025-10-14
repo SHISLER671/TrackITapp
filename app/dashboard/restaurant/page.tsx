@@ -7,6 +7,7 @@ import NavBar from '@/components/NavBar';
 import KegCard from '@/components/KegCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
+import PendingDeliveries from '@/components/PendingDeliveries';
 import { Keg } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
@@ -58,6 +59,17 @@ function DashboardContent() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Restaurant Dashboard</h1>
           <p className="text-gray-600 mt-2">Manage kegs at your location</p>
+        </div>
+
+        {/* Pending Deliveries - Priority Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Pending Deliveries</h2>
+            <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full">
+              REQUIRES ACTION
+            </span>
+          </div>
+          <PendingDeliveries onDeliveryAccepted={fetchKegs} />
         </div>
 
         {/* Stats */}

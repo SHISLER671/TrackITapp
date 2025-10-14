@@ -4,10 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/AuthProvider';
 import NavBar from '@/components/NavBar';
-import KegCard from '@/components/KegCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
-import { Keg } from '@/lib/types';
+import { Keg, Delivery } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
@@ -19,38 +18,67 @@ export default function DriverDashboard() {
   );
 }
 
+interface DeliveryWithDetails extends Delivery {
+  brewery?: { name: string };
+  restaurant?: any;
+}
+
 function DashboardContent() {
   const router = useRouter();
-  const [kegs, setKegs] = useState<Keg[]>([]);
+  const [kegsOnTruck, setKegsOnTruck] = useState<Keg[]>([]);
+  const [deliveries, setDeliveries] = useState<DeliveryWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchKegs();
+    fetchData();
+    
+    // Auto-refresh every 15 seconds
+    const interval = setInterval(fetchData, 15000);
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchKegs = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // Fetch kegs currently held by driver
+      const { data: kegs, error: kegsError } = await supabase
         .from('kegs')
         .select('*')
+        .eq('is_empty', false)
         .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setKegs(data || []);
+      
+      if (kegsError) throw kegsError;
+      
+      // Fetch driver's deliveries
+      const { data: deliveriesData, error: deliveriesError } = await supabase
+        .from('deliveries')
+        .select(`
+          *,
+          brewery:brewery_id(name),
+          restaurant:restaurant_id(id)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(10);
+      
+      if (deliveriesError) throw deliveriesError;
+      
+      setKegsOnTruck(kegs || []);
+      setDeliveries(deliveriesData || []);
+      setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch kegs');
+      setError(err instanceof Error ? err.message : 'Failed to load data');
     } finally {
       setLoading(false);
     }
   };
 
-  const scannedKegs = kegs.filter((k) => k.last_scan);
-  const unscannedKegs = kegs.filter((k) => !k.last_scan);
-  const completionRate = kegs.length > 0 
-    ? Math.round((scannedKegs.length / kegs.length) * 100) 
-    : 0;
+  const pendingDeliveries = deliveries.filter(d => d.status === 'PENDING');
+  const completedToday = deliveries.filter(
+    d => d.status === 'ACCEPTED' && 
+    new Date(d.accepted_at || '').toDateString() === new Date().toDateString()
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -59,94 +87,249 @@ function DashboardContent() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Driver Dashboard</h1>
-          <p className="text-gray-600 mt-2">Track your delivery route kegs</p>
+          <p className="text-gray-600 mt-2">Manage your deliveries</p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-sm text-gray-600">Total Kegs</div>
-            <div className="text-3xl font-bold text-gray-900 mt-2">{kegs.length}</div>
+            <div className="text-sm text-gray-600">Kegs On Truck</div>
+            <div className="text-3xl font-bold text-blue-600 mt-2">
+              {kegsOnTruck.length}
+            </div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-sm text-gray-600">Scanned</div>
-            <div className="text-3xl font-bold text-green-600 mt-2">{scannedKegs.length}</div>
+            <div className="text-sm text-gray-600">Pending Deliveries</div>
+            <div className="text-3xl font-bold text-orange-600 mt-2">
+              {pendingDeliveries.length}
+            </div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-sm text-gray-600">Remaining</div>
-            <div className="text-3xl font-bold text-orange-600 mt-2">{unscannedKegs.length}</div>
+            <div className="text-sm text-gray-600">Completed Today</div>
+            <div className="text-3xl font-bold text-green-600 mt-2">
+              {completedToday.length}
+            </div>
           </div>
         </div>
 
-        {/* Route Progress */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-semibold text-gray-900">Route Completion</h2>
-            <span className="text-2xl font-bold text-blue-600">{completionRate}%</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-            <div
-              className="bg-blue-600 h-full transition-all duration-300"
-              style={{ width: `${completionRate}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Quick Action */}
+        {/* Quick Actions */}
         <div className="mb-8">
-          <Link
-            href="/scan"
-            className="block bg-blue-600 text-white p-6 rounded-lg hover:bg-blue-700 transition-colors text-center font-medium text-xl"
-          >
-            📷 Scan Keg
-          </Link>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link
+              href="/scan"
+              className="bg-blue-600 text-white p-6 rounded-lg hover:bg-blue-700 transition-colors text-center"
+            >
+              <div className="text-3xl mb-2">📷</div>
+              <div className="font-bold">Scan Keg</div>
+              <div className="text-sm opacity-90 mt-1">Load or return kegs</div>
+            </Link>
+            <Link
+              href="/deliveries/new"
+              className="bg-green-600 text-white p-6 rounded-lg hover:bg-green-700 transition-colors text-center"
+            >
+              <div className="text-3xl mb-2">📦</div>
+              <div className="font-bold">Create Delivery</div>
+              <div className="text-sm opacity-90 mt-1">Start a new drop-off</div>
+            </Link>
+            <button
+              onClick={fetchData}
+              className="bg-gray-600 text-white p-6 rounded-lg hover:bg-gray-700 transition-colors text-center"
+            >
+              <div className="text-3xl mb-2">🔄</div>
+              <div className="font-bold">Refresh Status</div>
+              <div className="text-sm opacity-90 mt-1">Check for updates</div>
+            </button>
+          </div>
         </div>
 
-        {/* Unscanned Kegs */}
-        {unscannedKegs.length > 0 && (
+        {/* Pending Deliveries Alert */}
+        {pendingDeliveries.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              ⚠️ Kegs to Scan ({unscannedKegs.length})
-            </h2>
-            {loading ? (
-              <div className="flex justify-center py-12">
-                <LoadingSpinner size="lg" message="Loading kegs..." />
+            <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="text-3xl">⏳</div>
+                <div>
+                  <h3 className="text-lg font-bold text-orange-900">
+                    Waiting for Manager Acceptance
+                  </h3>
+                  <p className="text-sm text-orange-700">
+                    {pendingDeliveries.length} delivery pending
+                  </p>
+                </div>
               </div>
-            ) : error ? (
-              <ErrorMessage message={error} onRetry={fetchKegs} />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {unscannedKegs.map((keg) => (
-                  <KegCard
-                    key={keg.id}
-                    keg={keg}
-                    onClick={() => router.push('/scan')}
-                  />
+              <div className="space-y-2">
+                {pendingDeliveries.map((delivery) => (
+                  <div
+                    key={delivery.id}
+                    className="bg-white rounded-lg p-4 flex items-center justify-between"
+                  >
+                    <div>
+                      <div className="font-medium text-gray-900">
+                        {delivery.brewery?.name || 'Brewery'}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {delivery.keg_ids.length} keg(s) • Created {new Date(delivery.created_at).toLocaleTimeString()}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-medium">
+                        PENDING
+                      </span>
+                      <Link
+                        href={`/deliveries/${delivery.id}`}
+                        className="text-blue-600 hover:underline text-sm"
+                      >
+                        View
+                      </Link>
+                    </div>
+                  </div>
                 ))}
               </div>
-            )}
-          </div>
-        )}
-
-        {/* Scanned Kegs */}
-        {scannedKegs.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              ✓ Scanned Kegs ({scannedKegs.length})
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {scannedKegs.map((keg) => (
-                <KegCard
-                  key={keg.id}
-                  keg={keg}
-                  onClick={() => router.push(`/kegs/${keg.id}`)}
-                />
-              ))}
             </div>
           </div>
         )}
+
+        {/* Kegs On Truck */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Kegs On Truck ({kegsOnTruck.length})
+            </h2>
+            {kegsOnTruck.length > 0 && (
+              <Link
+                href="/deliveries/new"
+                className="text-blue-600 hover:underline text-sm font-medium"
+              >
+                Create Delivery →
+              </Link>
+            )}
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <LoadingSpinner size="lg" message="Loading kegs..." />
+            </div>
+          ) : error ? (
+            <ErrorMessage message={error} onRetry={fetchData} />
+          ) : kegsOnTruck.length === 0 ? (
+            <div className="bg-white rounded-lg shadow p-8 text-center text-gray-600">
+              <div className="text-4xl mb-2">🚚</div>
+              <p className="font-medium">No kegs loaded</p>
+              <p className="text-sm mt-2">Scan kegs to load them onto your truck</p>
+              <Link
+                href="/scan"
+                className="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Scan Keg
+              </Link>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Keg
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Beer
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Size
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Loaded
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {kegsOnTruck.map((keg) => (
+                    <tr key={keg.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {keg.id.substring(0, 8)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{keg.name}</div>
+                        <div className="text-xs text-gray-500">{keg.type}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {keg.keg_size}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {keg.last_scan ? new Date(keg.last_scan).toLocaleTimeString() : 'N/A'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Recent Deliveries */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Recent Deliveries
+          </h2>
+          {deliveries.length === 0 ? (
+            <div className="bg-white rounded-lg shadow p-8 text-center text-gray-600">
+              <p>No deliveries yet</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Time
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Brewery
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Kegs
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Status
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {deliveries.map((delivery) => (
+                    <tr key={delivery.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(delivery.created_at).toLocaleTimeString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {delivery.brewery?.name || 'Unknown'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {delivery.keg_ids.length}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full font-medium ${
+                            delivery.status === 'ACCEPTED'
+                              ? 'bg-green-100 text-green-700'
+                              : delivery.status === 'PENDING'
+                              ? 'bg-orange-100 text-orange-700'
+                              : delivery.status === 'REJECTED'
+                              ? 'bg-red-100 text-red-700'
+                              : 'bg-gray-100 text-gray-700'
+                          }`}
+                        >
+                          {delivery.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
 }
-

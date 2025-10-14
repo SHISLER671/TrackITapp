@@ -10,6 +10,7 @@ import ErrorMessage from '@/components/ErrorMessage';
 import { Keg } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import EndShiftSummary from '@/components/EndShiftSummary';
 
 export default function BrewerDashboard() {
   return (
@@ -24,6 +25,7 @@ function DashboardContent() {
   const [kegs, setKegs] = useState<Keg[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showEndShift, setShowEndShift] = useState(false);
 
   useEffect(() => {
     fetchKegs();
@@ -58,6 +60,12 @@ function DashboardContent() {
   const varianceAlerts = retiredKegs.filter(
     (k) => k.variance_status !== 'NORMAL'
   );
+  
+  // Today's brews count
+  const today = new Date().toDateString();
+  const todaysBrews = kegs.filter((k) => 
+    new Date(k.created_at).toDateString() === today
+  ).length;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -66,12 +74,23 @@ function DashboardContent() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Brewer Dashboard
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Manage all your brewery kegs and track inventory
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Brewer Dashboard
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Manage all your brewery kegs and track inventory
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                <div className="text-sm text-blue-600 font-medium">Today's Brews</div>
+                <div className="text-2xl font-bold text-blue-700">{todaysBrews}</div>
+                <div className="text-xs text-blue-500">Kegs Logged</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Stats */}
@@ -107,12 +126,22 @@ function DashboardContent() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Quick Actions
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Link
               href="/kegs/new"
-              className="bg-blue-600 text-white p-6 rounded-lg hover:bg-blue-700 transition-colors text-center font-medium"
+              className="bg-blue-600 text-white p-6 rounded-lg hover:bg-blue-700 transition-colors text-center font-bold text-lg"
             >
-              + Create New Keg
+              <div className="text-3xl mb-2">🍺</div>
+              <div>Create New Keg</div>
+              <div className="text-sm opacity-90 mt-1">Start brewing!</div>
+            </Link>
+            <Link
+              href="/kegs/batch"
+              className="bg-green-600 text-white p-6 rounded-lg hover:bg-green-700 transition-colors text-center font-bold"
+            >
+              <div className="text-3xl mb-2">📦</div>
+              <div>Batch Create</div>
+              <div className="text-sm opacity-90 mt-1">Multiple kegs</div>
             </Link>
             <Link
               href="/scan"
@@ -126,6 +155,12 @@ function DashboardContent() {
             >
               📊 View Reports
             </Link>
+            <button
+              onClick={() => setShowEndShift(true)}
+              className="bg-orange-600 text-white p-6 rounded-lg hover:bg-orange-700 transition-colors text-center font-medium"
+            >
+              🏁 End Shift
+            </button>
           </div>
         </div>
 
@@ -149,9 +184,19 @@ function DashboardContent() {
 
         {/* Active Kegs */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Active Kegs ({activeKegs.length})
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Active Kegs ({activeKegs.length})
+            </h2>
+            {activeKegs.length > 0 && (
+              <Link
+                href="/kegs/assign"
+                className="text-blue-600 hover:underline text-sm font-medium"
+              >
+                Bulk Assign to Drivers →
+              </Link>
+            )}
+          </div>
           {loading ? (
             <div className="flex justify-center py-12">
               <LoadingSpinner size="lg" message="Loading kegs..." />
@@ -195,6 +240,11 @@ function DashboardContent() {
           </div>
         )}
       </main>
+      
+      {/* End Shift Modal */}
+      {showEndShift && (
+        <EndShiftSummary onClose={() => setShowEndShift(false)} />
+      )}
     </div>
   );
 }
