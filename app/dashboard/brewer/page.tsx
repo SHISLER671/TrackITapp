@@ -1,71 +1,63 @@
-'use client';
+"use client"
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ProtectedRoute } from '@/components/AuthProvider';
-import NavBar from '@/components/NavBar';
-import KegCard from '@/components/KegCard';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import ErrorMessage from '@/components/ErrorMessage';
-import { Keg } from '@/lib/types';
-import { supabase } from '@/lib/supabase';
-import Link from 'next/link';
-import EndShiftSummary from '@/components/EndShiftSummary';
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { ProtectedRoute } from "@/components/AuthProvider"
+import NavBar from "@/components/NavBar"
+import KegCard from "@/components/KegCard"
+import LoadingSpinner from "@/components/LoadingSpinner"
+import ErrorMessage from "@/components/ErrorMessage"
+import type { Keg } from "@/lib/types"
+import { createClient } from "@/lib/supabase/client"
+import Link from "next/link"
+import EndShiftSummary from "@/components/EndShiftSummary"
 
 export default function BrewerDashboard() {
   return (
-    <ProtectedRoute allowedRoles={['BREWER']}>
+    <ProtectedRoute allowedRoles={["BREWER"]}>
       <DashboardContent />
     </ProtectedRoute>
-  );
+  )
 }
 
 function DashboardContent() {
-  const router = useRouter();
-  const [kegs, setKegs] = useState<Keg[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showEndShift, setShowEndShift] = useState(false);
+  const router = useRouter()
+  const [kegs, setKegs] = useState<Keg[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [showEndShift, setShowEndShift] = useState(false)
 
   useEffect(() => {
-    fetchKegs();
-  }, []);
+    fetchKegs()
+  }, [])
 
   const fetchKegs = async () => {
     try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('kegs')
-        .select('*')
-        .order('created_at', { ascending: false });
+      setLoading(true)
+      const supabase = createClient()
+      const { data, error } = await supabase.from("kegs").select("*").order("created_at", { ascending: false })
 
-      if (error) throw error;
-      setKegs(data || []);
+      if (error) throw error
+      setKegs(data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch kegs');
+      setError(err instanceof Error ? err.message : "Failed to fetch kegs")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const activeKegs = kegs.filter((k) => !k.is_empty);
-  const retiredKegs = kegs.filter((k) => k.is_empty);
+  const activeKegs = kegs.filter((k) => !k.is_empty)
+  const retiredKegs = kegs.filter((k) => k.is_empty)
   const problemKegs = kegs.filter(
     (k) =>
       !k.is_empty &&
-      (!k.last_scan ||
-        new Date().getTime() - new Date(k.last_scan).getTime() >
-          14 * 24 * 60 * 60 * 1000)
-  );
-  const varianceAlerts = retiredKegs.filter(
-    (k) => k.variance_status !== 'NORMAL'
-  );
-  
+      (!k.last_scan || new Date().getTime() - new Date(k.last_scan).getTime() > 14 * 24 * 60 * 60 * 1000),
+  )
+  const varianceAlerts = retiredKegs.filter((k) => k.variance_status !== "NORMAL")
+
   // Today's brews count
-  const today = new Date().toDateString();
-  const todaysBrews = kegs.filter((k) => 
-    new Date(k.created_at).toDateString() === today
-  ).length;
+  const today = new Date().toDateString()
+  const todaysBrews = kegs.filter((k) => new Date(k.created_at).toDateString() === today).length
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -76,12 +68,8 @@ function DashboardContent() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Brewer Dashboard
-              </h1>
-              <p className="text-gray-600 mt-2">
-                Manage all your brewery kegs and track inventory
-              </p>
+              <h1 className="text-3xl font-bold text-gray-900">Brewer Dashboard</h1>
+              <p className="text-gray-600 mt-2">Manage all your brewery kegs and track inventory</p>
             </div>
             <div className="text-right">
               <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
@@ -97,35 +85,25 @@ function DashboardContent() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-sm text-gray-600">Total Kegs</div>
-            <div className="text-3xl font-bold text-gray-900 mt-2">
-              {kegs.length}
-            </div>
+            <div className="text-3xl font-bold text-gray-900 mt-2">{kegs.length}</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-sm text-gray-600">Active Kegs</div>
-            <div className="text-3xl font-bold text-green-600 mt-2">
-              {activeKegs.length}
-            </div>
+            <div className="text-3xl font-bold text-green-600 mt-2">{activeKegs.length}</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-sm text-gray-600">Problem Kegs</div>
-            <div className="text-3xl font-bold text-yellow-600 mt-2">
-              {problemKegs.length}
-            </div>
+            <div className="text-3xl font-bold text-yellow-600 mt-2">{problemKegs.length}</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-sm text-gray-600">Variance Alerts</div>
-            <div className="text-3xl font-bold text-red-600 mt-2">
-              {varianceAlerts.length}
-            </div>
+            <div className="text-3xl font-bold text-red-600 mt-2">{varianceAlerts.length}</div>
           </div>
         </div>
 
         {/* Quick Actions */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Quick Actions
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Link
               href="/kegs/new"
@@ -167,16 +145,10 @@ function DashboardContent() {
         {/* Problem Kegs */}
         {problemKegs.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              ⚠️ Problem Kegs
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">⚠️ Problem Kegs</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {problemKegs.map((keg) => (
-                <KegCard
-                  key={keg.id}
-                  keg={keg}
-                  onClick={() => router.push(`/kegs/${keg.id}`)}
-                />
+                <KegCard key={keg.id} keg={keg} onClick={() => router.push(`/kegs/${keg.id}`)} />
               ))}
             </div>
           </div>
@@ -185,14 +157,9 @@ function DashboardContent() {
         {/* Active Kegs */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Active Kegs ({activeKegs.length})
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900">Active Kegs ({activeKegs.length})</h2>
             {activeKegs.length > 0 && (
-              <Link
-                href="/kegs/assign"
-                className="text-blue-600 hover:underline text-sm font-medium"
-              >
+              <Link href="/kegs/assign" className="text-blue-600 hover:underline text-sm font-medium">
                 Bulk Assign to Drivers →
               </Link>
             )}
@@ -210,12 +177,7 @@ function DashboardContent() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {activeKegs.map((keg) => (
-                <KegCard
-                  key={keg.id}
-                  keg={keg}
-                  showProgress
-                  onClick={() => router.push(`/kegs/${keg.id}`)}
-                />
+                <KegCard key={keg.id} keg={keg} showProgress onClick={() => router.push(`/kegs/${keg.id}`)} />
               ))}
             </div>
           )}
@@ -224,27 +186,18 @@ function DashboardContent() {
         {/* Retired Kegs with Variance */}
         {varianceAlerts.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              🚨 Variance Alerts
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">🚨 Variance Alerts</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {varianceAlerts.map((keg) => (
-                <KegCard
-                  key={keg.id}
-                  keg={keg}
-                  showVariance
-                  onClick={() => router.push(`/kegs/${keg.id}`)}
-                />
+                <KegCard key={keg.id} keg={keg} showVariance onClick={() => router.push(`/kegs/${keg.id}`)} />
               ))}
             </div>
           </div>
         )}
       </main>
-      
+
       {/* End Shift Modal */}
-      {showEndShift && (
-        <EndShiftSummary onClose={() => setShowEndShift(false)} />
-      )}
+      {showEndShift && <EndShiftSummary onClose={() => setShowEndShift(false)} />}
     </div>
-  );
+  )
 }

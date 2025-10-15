@@ -1,55 +1,53 @@
-'use client';
+"use client"
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ProtectedRoute } from '@/components/AuthProvider';
-import NavBar from '@/components/NavBar';
-import KegCard from '@/components/KegCard';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import ErrorMessage from '@/components/ErrorMessage';
-import PendingDeliveries from '@/components/PendingDeliveries';
-import { Keg } from '@/lib/types';
-import { supabase } from '@/lib/supabase';
-import Link from 'next/link';
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { ProtectedRoute } from "@/components/AuthProvider"
+import NavBar from "@/components/NavBar"
+import KegCard from "@/components/KegCard"
+import LoadingSpinner from "@/components/LoadingSpinner"
+import ErrorMessage from "@/components/ErrorMessage"
+import PendingDeliveries from "@/components/PendingDeliveries"
+import type { Keg } from "@/lib/types"
+import { createClient } from "@/lib/supabase/client"
+import Link from "next/link"
 
 export default function RestaurantDashboard() {
   return (
-    <ProtectedRoute allowedRoles={['RESTAURANT_MANAGER']}>
+    <ProtectedRoute allowedRoles={["RESTAURANT_MANAGER"]}>
       <DashboardContent />
     </ProtectedRoute>
-  );
+  )
 }
 
 function DashboardContent() {
-  const router = useRouter();
-  const [kegs, setKegs] = useState<Keg[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter()
+  const [kegs, setKegs] = useState<Keg[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchKegs();
-  }, []);
+    fetchKegs()
+  }, [])
 
   const fetchKegs = async () => {
     try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('kegs')
-        .select('*')
-        .order('created_at', { ascending: false });
+      setLoading(true)
+      const supabase = createClient()
+      const { data, error } = await supabase.from("kegs").select("*").order("created_at", { ascending: false })
 
-      if (error) throw error;
-      setKegs(data || []);
+      if (error) throw error
+      setKegs(data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch kegs');
+      setError(err instanceof Error ? err.message : "Failed to fetch kegs")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const activeKegs = kegs.filter((k) => !k.is_empty);
-  const emptyKegs = kegs.filter((k) => k.is_empty && k.variance_status === 'NORMAL');
-  const varianceKegs = kegs.filter((k) => k.is_empty && k.variance_status !== 'NORMAL');
+  const activeKegs = kegs.filter((k) => !k.is_empty)
+  const emptyKegs = kegs.filter((k) => k.is_empty && k.variance_status === "NORMAL")
+  const varianceKegs = kegs.filter((k) => k.is_empty && k.variance_status !== "NORMAL")
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -65,9 +63,7 @@ function DashboardContent() {
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-xl font-semibold text-gray-900">Pending Deliveries</h2>
-            <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full">
-              REQUIRES ACTION
-            </span>
+            <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full">REQUIRES ACTION</span>
           </div>
           <PendingDeliveries onDeliveryAccepted={fetchKegs} />
         </div>
@@ -109,9 +105,7 @@ function DashboardContent() {
 
         {/* Active Kegs */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Active Kegs on Tap ({activeKegs.length})
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Active Kegs on Tap ({activeKegs.length})</h2>
           {loading ? (
             <div className="flex justify-center py-12">
               <LoadingSpinner size="lg" message="Loading kegs..." />
@@ -125,12 +119,7 @@ function DashboardContent() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {activeKegs.map((keg) => (
-                <KegCard
-                  key={keg.id}
-                  keg={keg}
-                  showProgress
-                  onClick={() => router.push(`/kegs/${keg.id}`)}
-                />
+                <KegCard key={keg.id} keg={keg} showProgress onClick={() => router.push(`/kegs/${keg.id}`)} />
               ))}
             </div>
           )}
@@ -139,17 +128,10 @@ function DashboardContent() {
         {/* Empty Kegs */}
         {emptyKegs.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Empty Kegs ({emptyKegs.length})
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Empty Kegs ({emptyKegs.length})</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {emptyKegs.map((keg) => (
-                <KegCard
-                  key={keg.id}
-                  keg={keg}
-                  showVariance
-                  onClick={() => router.push(`/kegs/${keg.id}`)}
-                />
+                <KegCard key={keg.id} keg={keg} showVariance onClick={() => router.push(`/kegs/${keg.id}`)} />
               ))}
             </div>
           </div>
@@ -158,22 +140,15 @@ function DashboardContent() {
         {/* Variance Alerts */}
         {varianceKegs.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              🚨 Variance Alerts ({varianceKegs.length})
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">🚨 Variance Alerts ({varianceKegs.length})</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {varianceKegs.map((keg) => (
-                <KegCard
-                  key={keg.id}
-                  keg={keg}
-                  showVariance
-                  onClick={() => router.push(`/reports/${keg.id}`)}
-                />
+                <KegCard key={keg.id} keg={keg} showVariance onClick={() => router.push(`/reports/${keg.id}`)} />
               ))}
             </div>
           </div>
         )}
       </main>
     </div>
-  );
+  )
 }

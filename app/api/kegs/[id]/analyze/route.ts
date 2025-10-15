@@ -1,88 +1,73 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { requireBrewerOrManager } from '@/lib/middleware/auth';
-import { supabase } from '@/lib/supabase';
-import { analyzeVariance } from '@/lib/ai/variance-analysis';
-import { z } from 'zod';
+import { type NextRequest, NextResponse } from "next/server"
+import { requireBrewerOrManager } from "@/lib/middleware/auth"
+import { createClient } from "@/lib/supabase/server"
+import { analyzeVariance } from "@/lib/ai/variance-analysis"
+import { z } from "zod"
 
 // Schema for analysis request
 const analyzeSchema = z.object({
   variance: z.number(),
-  varianceStatus: z.enum(['NORMAL', 'WARNING', 'CRITICAL']),
-});
+  varianceStatus: z.enum(["NORMAL", "WARNING", "CRITICAL"]),
+})
 
 // POST /api/kegs/[id]/analyze - Trigger variance analysis
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const authResult = await requireBrewerOrManager(request);
-  
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const authResult = await requireBrewerOrManager(request)
+
   if (authResult instanceof NextResponse) {
-    return authResult;
+    return authResult
   }
-  
-  const { user, userRole } = authResult;
-  
+
+  const { user, userRole } = authResult
+
+  const supabase = await createClient()
+
   try {
-    const body = await request.json();
-    
+    const body = await request.json()
+
     // Validate input
-    const validatedData = analyzeSchema.parse(body);
-    
+    const validatedData = analyzeSchema.parse(body)
+
     // Get keg with scan history
-    const { id } = await params;
-    const { data: keg, error: kegError } = await supabase
-      .from('kegs')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
+    const { id } = await params
+    const { data: keg, error: kegError } = await supabase.from("kegs").select("*").eq("id", id).single()
+
     if (kegError || !keg) {
-      return NextResponse.json(
-        { error: 'Keg not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Keg not found" }, { status: 404 })
     }
-    
+
     // Check access permissions
     const hasAccess =
-      (userRole.role === 'BREWER' && keg.brewery_id === userRole.brewery_id) ||
-      (userRole.role === 'RESTAURANT_MANAGER' && keg.current_holder === userRole.id);
-    
+      (userRole.role === "BREWER" && keg.brewery_id === userRole.brewery_id) ||
+      (userRole.role === "RESTAURANT_MANAGER" && keg.current_holder === userRole.id)
+
     if (!hasAccess) {
-      return NextResponse.json(
-        { error: 'Access denied' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Access denied" }, { status: 403 })
     }
-    
+
     // Get scan history
     const { data: scans, error: scansError } = await supabase
-      .from('keg_scans')
-      .select('timestamp, location, scanned_by')
-      .eq('keg_id', id)
-      .order('timestamp', { ascending: true });
-    
+      .from("keg_scans")
+      .select("timestamp, location, scanned_by")
+      .eq("keg_id", id)
+      .order("timestamp", { ascending: true })
+
     if (scansError) {
-      throw scansError;
+      throw scansError
     }
-    
+
     // Run AI analysis
-    const mappedScans = (scans || []).map(scan => ({
+    const mappedScans = (scans || []).map((scan) => ({
       timestamp: scan.timestamp,
       location: scan.location,
-      scannedBy: scan.scanned_by
-    }));
-    
-    const analysis = await analyzeVariance(
-      keg,
-      validatedData.variance,
-      mappedScans
-    );
-    
+      scannedBy: scan.scanned_by,
+    }))
+
+    const analysis = await analyzeVariance(keg, validatedData.variance, mappedScans)
+
     // Store analysis report
     const { data: report, error: reportError } = await supabase
-      .from('variance_reports')
+      .from("variance_reports")
       .insert({
         keg_id: id,
         variance_amount: validatedData.variance,
@@ -91,29 +76,23 @@ export async function POST(
         resolved: false,
       })
       .select()
-      .single();
-    
+      .single()
+
     if (reportError) {
-      throw reportError;
+      throw reportError
     }
-    
+
     return NextResponse.json({
-      message: 'Variance analysis completed',
+      message: "Variance analysis completed",
       report,
       analysis,
-    });
+    })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Invalid input', details: error.errors },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid input", details: error.errors }, { status: 400 })
     }
-    
-    console.error('Error analyzing variance:', error);
-    return NextResponse.json(
-      { error: 'Failed to analyze variance' },
-      { status: 500 }
-    );
+
+    console.error("Error analyzing variance:", error)
+    return NextResponse.json({ error: "Failed to analyze variance" }, { status: 500 })
   }
 }

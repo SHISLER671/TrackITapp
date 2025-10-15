@@ -1,48 +1,51 @@
 // Authentication helpers
 
-import { supabase, getCurrentUser, getUserRole } from './supabase';
-import { UserRole, UserRoleRecord } from './types';
+import { createClient } from "./supabase/server"
+import type { UserRole, UserRoleRecord } from "./types"
 
 /**
  * Sign in with email and password
  */
 export async function signIn(email: string, password: string) {
+  const supabase = await createClient()
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
-  });
-  
+  })
+
   if (error) {
-    throw new Error(error.message);
+    throw new Error(error.message)
   }
-  
-  return data;
+
+  return data
 }
 
 /**
  * Sign up new user with email and password
  */
 export async function signUp(email: string, password: string) {
+  const supabase = await createClient()
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-  });
-  
+  })
+
   if (error) {
-    throw new Error(error.message);
+    throw new Error(error.message)
   }
-  
-  return data;
+
+  return data
 }
 
 /**
  * Sign out current user
  */
 export async function signOut() {
-  const { error } = await supabase.auth.signOut();
-  
+  const supabase = await createClient()
+  const { error } = await supabase.auth.signOut()
+
   if (error) {
-    throw new Error(error.message);
+    throw new Error(error.message)
   }
 }
 
@@ -50,92 +53,93 @@ export async function signOut() {
  * Get current authenticated user with role
  */
 export async function getCurrentUserWithRole(): Promise<{
-  user: any;
-  role: UserRoleRecord;
+  user: any
+  role: UserRoleRecord
 } | null> {
-  const user = await getCurrentUser();
-  
+  const user = await getCurrentUser()
+
   if (!user) {
-    return null;
+    return null
   }
-  
-  const role = await getUserRole(user.id);
-  
+
+  const role = await getUserRole(user.id)
+
   if (!role) {
-    return null;
+    return null
   }
-  
-  return { user, role };
+
+  return { user, role }
 }
 
 /**
  * Check if user has required role
  */
 export async function hasRole(requiredRoles: UserRole[]): Promise<boolean> {
-  const userWithRole = await getCurrentUserWithRole();
-  
+  const userWithRole = await getCurrentUserWithRole()
+
   if (!userWithRole) {
-    return false;
+    return false
   }
-  
-  return requiredRoles.includes(userWithRole.role.role);
+
+  return requiredRoles.includes(userWithRole.role.role)
 }
 
 /**
  * Check if user is a brewer
  */
 export async function isBrewer(): Promise<boolean> {
-  return hasRole(['BREWER']);
+  return hasRole(["BREWER"])
 }
 
 /**
  * Check if user is a driver
  */
 export async function isDriver(): Promise<boolean> {
-  return hasRole(['DRIVER']);
+  return hasRole(["DRIVER"])
 }
 
 /**
  * Check if user is a restaurant manager
  */
 export async function isRestaurantManager(): Promise<boolean> {
-  return hasRole(['RESTAURANT_MANAGER']);
+  return hasRole(["RESTAURANT_MANAGER"])
 }
 
 /**
  * Get user's brewery ID (for brewers)
  */
 export async function getUserBreweryId(): Promise<string | null> {
-  const userWithRole = await getCurrentUserWithRole();
-  
-  if (!userWithRole || userWithRole.role.role !== 'BREWER') {
-    return null;
+  const userWithRole = await getCurrentUserWithRole()
+
+  if (!userWithRole || userWithRole.role.role !== "BREWER") {
+    return null
   }
-  
-  return userWithRole.role.brewery_id;
+
+  return userWithRole.role.brewery_id
 }
 
 /**
  * Get user's location ID (for restaurant managers and drivers)
  */
 export async function getUserLocationId(): Promise<string | null> {
-  const userWithRole = await getCurrentUserWithRole();
-  
+  const userWithRole = await getCurrentUserWithRole()
+
   if (!userWithRole) {
-    return null;
+    return null
   }
-  
-  return userWithRole.role.location_id;
+
+  return userWithRole.role.location_id
 }
 
 /**
  * Reset password
  */
 export async function resetPassword(email: string) {
-  const { error } = await supabase.auth.resetPasswordForEmail(email);
-  
+  const supabase = await createClient()
+  const { error } = await supabase.auth.resetPasswordForEmail(email)
+
   if (error) {
-    throw new Error(error.message);
+    throw new Error(error.message)
   }
 }
 
@@ -143,11 +147,45 @@ export async function resetPassword(email: string) {
  * Update password
  */
 export async function updatePassword(newPassword: string) {
+  const supabase = await createClient()
   const { error } = await supabase.auth.updateUser({
     password: newPassword,
-  });
-  
+  })
+
   if (error) {
-    throw new Error(error.message);
+    throw new Error(error.message)
   }
+}
+
+/**
+ * Get current authenticated user
+ */
+export async function getCurrentUser() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser()
+
+  if (error) {
+    console.error("Error getting current user:", error)
+    return null
+  }
+
+  return user
+}
+
+/**
+ * Get user role
+ */
+export async function getUserRole(userId: string) {
+  const supabase = await createClient()
+  const { data, error } = await supabase.from("user_roles").select("*").eq("user_id", userId).single()
+
+  if (error) {
+    console.error("Error getting user role:", error)
+    return null
+  }
+
+  return data
 }

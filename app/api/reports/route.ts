@@ -1,45 +1,41 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { requireBrewerOrManager } from '@/lib/middleware/auth';
-import { supabase } from '@/lib/supabase';
+import { type NextRequest, NextResponse } from "next/server"
+import { requireBrewerOrManager } from "@/lib/middleware/auth"
+import { createClient } from "@/lib/supabase/server"
 
 // GET /api/reports - List variance reports
 export async function GET(request: NextRequest) {
-  const authResult = await requireBrewerOrManager(request);
-  
+  const authResult = await requireBrewerOrManager(request)
+
   if (authResult instanceof NextResponse) {
-    return authResult;
+    return authResult
   }
-  
-  const { user, userRole } = authResult;
-  
+
+  const { user, userRole } = authResult
+
+  const supabase = await createClient()
+
   try {
     // Build query based on role
-    let query = supabase
-      .from('variance_reports')
-      .select('*, kegs(*)')
-      .order('created_at', { ascending: false });
-    
+    let query = supabase.from("variance_reports").select("*, kegs(*)").order("created_at", { ascending: false })
+
     // Filter by brewery for brewers
-    if (userRole.role === 'BREWER') {
+    if (userRole.role === "BREWER") {
       // Join with kegs table to filter by brewery
-      query = query.eq('kegs.brewery_id', userRole.brewery_id);
-    } else if (userRole.role === 'RESTAURANT_MANAGER') {
+      query = query.eq("kegs.brewery_id", userRole.brewery_id)
+    } else if (userRole.role === "RESTAURANT_MANAGER") {
       // Filter by current holder
-      query = query.eq('kegs.current_holder', userRole.id);
+      query = query.eq("kegs.current_holder", userRole.id)
     }
-    
-    const { data: reports, error } = await query;
-    
+
+    const { data: reports, error } = await query
+
     if (error) {
-      throw error;
+      throw error
     }
-    
-    return NextResponse.json({ reports });
+
+    return NextResponse.json({ reports })
   } catch (error) {
-    console.error('Error fetching reports:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch reports' },
-      { status: 500 }
-    );
+    console.error("Error fetching reports:", error)
+    return NextResponse.json({ error: "Failed to fetch reports" }, { status: 500 })
   }
 }

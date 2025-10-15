@@ -1,128 +1,124 @@
-'use client';
+"use client"
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ProtectedRoute, useAuth } from '@/components/AuthProvider';
-import NavBar from '@/components/NavBar';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import ErrorMessage from '@/components/ErrorMessage';
-import { Keg } from '@/lib/types';
-import { supabase } from '@/lib/supabase';
-import Link from 'next/link';
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { ProtectedRoute, useAuth } from "@/components/AuthProvider"
+import NavBar from "@/components/NavBar"
+import LoadingSpinner from "@/components/LoadingSpinner"
+import ErrorMessage from "@/components/ErrorMessage"
+import type { Keg } from "@/lib/types"
+import { createClient } from "@/lib/supabase/client"
+import Link from "next/link"
 
 export default function AssignKegsPage() {
   return (
-    <ProtectedRoute allowedRoles={['BREWER']}>
+    <ProtectedRoute allowedRoles={["BREWER"]}>
       <AssignKegsContent />
     </ProtectedRoute>
-  );
+  )
 }
 
 interface Driver {
-  id: string;
-  user_id: string;
-  role: string;
+  id: string
+  user_id: string
+  role: string
 }
 
 function AssignKegsContent() {
-  const router = useRouter();
-  const { userRole } = useAuth();
-  const [kegs, setKegs] = useState<Keg[]>([]);
-  const [drivers, setDrivers] = useState<Driver[]>([]);
-  const [selectedKegs, setSelectedKegs] = useState<string[]>([]);
-  const [selectedDriver, setSelectedDriver] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [assigning, setAssigning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter()
+  const { userRole } = useAuth()
+  const [kegs, setKegs] = useState<Keg[]>([])
+  const [drivers, setDrivers] = useState<Driver[]>([])
+  const [selectedKegs, setSelectedKegs] = useState<string[]>([])
+  const [selectedDriver, setSelectedDriver] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [assigning, setAssigning] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData()
+  }, [])
 
   const fetchData = async () => {
     try {
-      setLoading(true);
-      
+      setLoading(true)
+
+      const supabase = createClient()
+
       // Fetch unassigned kegs (no current holder or holder is brewery)
       const { data: kegsData, error: kegsError } = await supabase
-        .from('kegs')
-        .select('*')
-        .eq('is_empty', false)
-        .order('created_at', { ascending: false });
-      
-      if (kegsError) throw kegsError;
-      
+        .from("kegs")
+        .select("*")
+        .eq("is_empty", false)
+        .order("created_at", { ascending: false })
+
+      if (kegsError) throw kegsError
+
       // Fetch drivers
       const { data: driversData, error: driversError } = await supabase
-        .from('user_roles')
-        .select('id, user_id, role')
-        .eq('role', 'DRIVER');
-      
-      if (driversError) throw driversError;
-      
-      setKegs(kegsData || []);
-      setDrivers(driversData || []);
-      setError(null);
+        .from("user_roles")
+        .select("id, user_id, role")
+        .eq("role", "DRIVER")
+
+      if (driversError) throw driversError
+
+      setKegs(kegsData || [])
+      setDrivers(driversData || [])
+      setError(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load data');
+      setError(err instanceof Error ? err.message : "Failed to load data")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleKegToggle = (kegId: string) => {
-    setSelectedKegs((prev) =>
-      prev.includes(kegId)
-        ? prev.filter((id) => id !== kegId)
-        : [...prev, kegId]
-    );
-  };
+    setSelectedKegs((prev) => (prev.includes(kegId) ? prev.filter((id) => id !== kegId) : [...prev, kegId]))
+  }
 
   const handleSelectAll = () => {
     if (selectedKegs.length === kegs.length) {
-      setSelectedKegs([]);
+      setSelectedKegs([])
     } else {
-      setSelectedKegs(kegs.map((k) => k.id));
+      setSelectedKegs(kegs.map((k) => k.id))
     }
-  };
+  }
 
   const handleAssign = async () => {
     if (selectedKegs.length === 0) {
-      alert('Please select at least one keg');
-      return;
-    }
-    
-    if (!selectedDriver) {
-      alert('Please select a driver');
-      return;
+      alert("Please select at least one keg")
+      return
     }
 
-    setAssigning(true);
-    setError(null);
+    if (!selectedDriver) {
+      alert("Please select a driver")
+      return
+    }
+
+    setAssigning(true)
+    setError(null)
 
     try {
+      const supabase = createClient()
       // Update kegs to assign them to the driver
-      const { error } = await supabase
-        .from('kegs')
-        .update({ current_holder: selectedDriver })
-        .in('id', selectedKegs);
+      const { error } = await supabase.from("kegs").update({ current_holder: selectedDriver }).in("id", selectedKegs)
 
-      if (error) throw error;
+      if (error) throw error
 
-      alert(`✅ Successfully assigned ${selectedKegs.length} keg(s) to driver!`);
-      
+      alert(`✅ Successfully assigned ${selectedKegs.length} keg(s) to driver!`)
+
       // Refresh data
-      await fetchData();
-      setSelectedKegs([]);
-      setSelectedDriver('');
+      await fetchData()
+      setSelectedKegs([])
+      setSelectedDriver("")
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to assign kegs');
+      setError(err instanceof Error ? err.message : "Failed to assign kegs")
     } finally {
-      setAssigning(false);
+      setAssigning(false)
     }
-  };
+  }
 
-  const selectedDriverInfo = drivers.find(d => d.id === selectedDriver);
+  const selectedDriverInfo = drivers.find((d) => d.id === selectedDriver)
 
   if (loading) {
     return (
@@ -132,7 +128,7 @@ function AssignKegsContent() {
           <LoadingSpinner size="lg" message="Loading kegs and drivers..." />
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -144,14 +140,9 @@ function AssignKegsContent() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Assign Kegs to Drivers</h1>
-              <p className="text-gray-600 mt-2">
-                Select kegs and assign them to drivers for delivery
-              </p>
+              <p className="text-gray-600 mt-2">Select kegs and assign them to drivers for delivery</p>
             </div>
-            <button
-              onClick={() => router.back()}
-              className="text-blue-600 hover:underline"
-            >
+            <button onClick={() => router.back()} className="text-blue-600 hover:underline">
               ← Back to Dashboard
             </button>
           </div>
@@ -189,25 +180,20 @@ function AssignKegsContent() {
                 <h2 className="text-lg font-semibold text-gray-900">
                   Select Kegs ({selectedKegs.length}/{kegs.length})
                 </h2>
-                <button
-                  onClick={handleSelectAll}
-                  className="text-sm text-blue-600 hover:underline"
-                >
-                  {selectedKegs.length === kegs.length ? 'Deselect All' : 'Select All'}
+                <button onClick={handleSelectAll} className="text-sm text-blue-600 hover:underline">
+                  {selectedKegs.length === kegs.length ? "Deselect All" : "Select All"}
                 </button>
               </div>
 
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {kegs.map((keg) => {
-                  const isSelected = selectedKegs.includes(keg.id);
+                  const isSelected = selectedKegs.includes(keg.id)
                   return (
                     <div
                       key={keg.id}
                       onClick={() => handleKegToggle(keg.id)}
                       className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                        isSelected
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                        isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
                       <div className="flex items-center">
@@ -220,33 +206,25 @@ function AssignKegsContent() {
                         <div className="ml-4 flex-1">
                           <div className="flex items-center justify-between">
                             <div>
-                              <div className="font-medium text-gray-900">
-                                {keg.name}
-                              </div>
+                              <div className="font-medium text-gray-900">{keg.name}</div>
                               <div className="text-sm text-gray-600">
                                 {keg.type} • {keg.keg_size}
                               </div>
                             </div>
-                            <div className="text-sm text-gray-500">
-                              {new Date(keg.created_at).toLocaleDateString()}
-                            </div>
+                            <div className="text-sm text-gray-500">{new Date(keg.created_at).toLocaleDateString()}</div>
                           </div>
-                          <div className="text-xs text-gray-500 mt-1">
-                            ID: {keg.id.substring(0, 12)}
-                          </div>
+                          <div className="text-xs text-gray-500 mt-1">ID: {keg.id.substring(0, 12)}</div>
                         </div>
                       </div>
                     </div>
-                  );
+                  )
                 })}
               </div>
             </div>
 
             {/* Driver Selection */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Select Driver
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Driver</h2>
 
               <div className="space-y-3">
                 {drivers.map((driver) => (
@@ -255,8 +233,8 @@ function AssignKegsContent() {
                     onClick={() => setSelectedDriver(driver.id)}
                     className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                       selectedDriver === driver.id
-                        ? 'border-green-500 bg-green-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? "border-green-500 bg-green-50"
+                        : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     <div className="flex items-center">
@@ -267,12 +245,8 @@ function AssignKegsContent() {
                         className="h-5 w-5 text-green-600"
                       />
                       <div className="ml-4">
-                        <div className="font-medium text-gray-900">
-                          Driver {driver.id.substring(0, 8)}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          ID: {driver.user_id.substring(0, 12)}...
-                        </div>
+                        <div className="font-medium text-gray-900">Driver {driver.id.substring(0, 8)}</div>
+                        <div className="text-sm text-gray-600">ID: {driver.user_id.substring(0, 12)}...</div>
                       </div>
                     </div>
                   </div>
@@ -285,7 +259,9 @@ function AssignKegsContent() {
                   <h3 className="font-medium text-blue-900 mb-2">Assignment Summary</h3>
                   <div className="text-sm text-blue-700">
                     <div>• {selectedKegs.length} keg(s) selected</div>
-                    <div>• Driver: {selectedDriverInfo ? `Driver ${selectedDriverInfo.id.substring(0, 8)}` : 'Unknown'}</div>
+                    <div>
+                      • Driver: {selectedDriverInfo ? `Driver ${selectedDriverInfo.id.substring(0, 8)}` : "Unknown"}
+                    </div>
                     <div>• Ready to assign</div>
                   </div>
                 </div>
@@ -307,7 +283,7 @@ function AssignKegsContent() {
                     <>
                       <span>📦</span>
                       <span>
-                        Assign {selectedKegs.length} Keg{selectedKegs.length !== 1 ? 's' : ''}
+                        Assign {selectedKegs.length} Keg{selectedKegs.length !== 1 ? "s" : ""}
                       </span>
                     </>
                   )}
@@ -318,5 +294,5 @@ function AssignKegsContent() {
         )}
       </main>
     </div>
-  );
+  )
 }

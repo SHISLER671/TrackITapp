@@ -1,62 +1,63 @@
-'use client';
+"use client"
 
-import React, { useState, useEffect } from 'react';
-import { Keg } from '@/lib/types';
-import { supabase } from '@/lib/supabase';
-import { generateShiftInsights } from '@/lib/ai-assistant';
+import { useState, useEffect } from "react"
+import type { Keg } from "@/lib/types"
+import { createClient } from "@/lib/supabase/client"
+import { generateShiftInsights } from "@/lib/ai-assistant"
 
 interface EndShiftSummaryProps {
-  onClose: () => void;
+  onClose: () => void
 }
 
 interface ShiftStats {
-  kegsCreated: number;
-  totalABV: number;
-  averageABV: number;
-  kegTypes: { [key: string]: number };
-  kegSizes: { [key: string]: number };
-  kegs: Keg[];
-  aiInsights?: string;
+  kegsCreated: number
+  totalABV: number
+  averageABV: number
+  kegTypes: { [key: string]: number }
+  kegSizes: { [key: string]: number }
+  kegs: Keg[]
+  aiInsights?: string
 }
 
 export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
-  const [stats, setStats] = useState<ShiftStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [stats, setStats] = useState<ShiftStats | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [generatingPdf, setGeneratingPdf] = useState(false)
 
   useEffect(() => {
-    loadShiftStats();
-  }, []);
+    loadShiftStats()
+  }, [])
 
   const loadShiftStats = async () => {
     try {
-      const today = new Date();
-      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      
+      const supabase = createClient()
+      const today = new Date()
+      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+
       const { data, error } = await supabase
-        .from('kegs')
-        .select('*')
-        .gte('created_at', startOfDay.toISOString())
-        .order('created_at', { ascending: false });
+        .from("kegs")
+        .select("*")
+        .gte("created_at", startOfDay.toISOString())
+        .order("created_at", { ascending: false })
 
-      if (error) throw error;
+      if (error) throw error
 
-      const kegs = data || [];
-      const kegsCreated = kegs.length;
-      const totalABV = kegs.reduce((sum, keg) => sum + keg.abv, 0);
-      const averageABV = kegsCreated > 0 ? totalABV / kegsCreated : 0;
-      
-      const kegTypes: { [key: string]: number } = {};
-      const kegSizes: { [key: string]: number } = {};
-      
-      kegs.forEach(keg => {
-        kegTypes[keg.type] = (kegTypes[keg.type] || 0) + 1;
-        kegSizes[keg.keg_size] = (kegSizes[keg.keg_size] || 0) + 1;
-      });
+      const kegs = data || []
+      const kegsCreated = kegs.length
+      const totalABV = kegs.reduce((sum, keg) => sum + keg.abv, 0)
+      const averageABV = kegsCreated > 0 ? totalABV / kegsCreated : 0
+
+      const kegTypes: { [key: string]: number } = {}
+      const kegSizes: { [key: string]: number } = {}
+
+      kegs.forEach((keg) => {
+        kegTypes[keg.type] = (kegTypes[keg.type] || 0) + 1
+        kegSizes[keg.keg_size] = (kegSizes[keg.keg_size] || 0) + 1
+      })
 
       // Generate AI insights
-      const aiInsights = await generateShiftInsights(kegs);
-      
+      const aiInsights = await generateShiftInsights(kegs)
+
       setStats({
         kegsCreated,
         totalABV,
@@ -65,17 +66,17 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
         kegSizes,
         kegs,
         aiInsights,
-      });
+      })
     } catch (error) {
-      console.error('Failed to load shift stats:', error);
+      console.error("Failed to load shift stats:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const generatePDF = async () => {
-    setGeneratingPdf(true);
-    
+    setGeneratingPdf(true)
+
     try {
       // Create HTML content for PDF
       const htmlContent = `
@@ -123,9 +124,9 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
                 <tr><th>Beer Style</th><th>Count</th></tr>
               </thead>
               <tbody>
-                ${Object.entries(stats?.kegTypes || {}).map(([style, count]) => 
-                  `<tr><td>${style}</td><td>${count}</td></tr>`
-                ).join('')}
+                ${Object.entries(stats?.kegTypes || {})
+                  .map(([style, count]) => `<tr><td>${style}</td><td>${count}</td></tr>`)
+                  .join("")}
               </tbody>
             </table>
             
@@ -135,9 +136,9 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
                 <tr><th>Keg Size</th><th>Count</th></tr>
               </thead>
               <tbody>
-                ${Object.entries(stats?.kegSizes || {}).map(([size, count]) => 
-                  `<tr><td>${size}</td><td>${count}</td></tr>`
-                ).join('')}
+                ${Object.entries(stats?.kegSizes || {})
+                  .map(([size, count]) => `<tr><td>${size}</td><td>${count}</td></tr>`)
+                  .join("")}
               </tbody>
             </table>
             
@@ -147,39 +148,44 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
                 <tr><th>Name</th><th>Style</th><th>ABV</th><th>IBU</th><th>Size</th><th>Created</th></tr>
               </thead>
               <tbody>
-                ${stats?.kegs.map(keg => 
-                  `<tr>
+                ${
+                  stats?.kegs
+                    .map(
+                      (keg) =>
+                        `<tr>
                     <td>${keg.name}</td>
                     <td>${keg.type}</td>
                     <td>${keg.abv}%</td>
                     <td>${keg.ibu}</td>
                     <td>${keg.keg_size}</td>
                     <td>${new Date(keg.created_at).toLocaleTimeString()}</td>
-                  </tr>`
-                ).join('') || ''}
+                  </tr>`,
+                    )
+                    .join("") || ""
+                }
               </tbody>
             </table>
           </body>
         </html>
-      `;
+      `
 
       // Open in new window for printing
-      const printWindow = window.open('', '_blank');
+      const printWindow = window.open("", "_blank")
       if (printWindow) {
-        printWindow.document.write(htmlContent);
-        printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
+        printWindow.document.write(htmlContent)
+        printWindow.document.close()
+        printWindow.focus()
+        printWindow.print()
       }
-      
-      alert('PDF report opened for printing!');
+
+      alert("PDF report opened for printing!")
     } catch (error) {
-      console.error('Failed to generate PDF:', error);
-      alert('Failed to generate PDF report');
+      console.error("Failed to generate PDF:", error)
+      alert("Failed to generate PDF report")
     } finally {
-      setGeneratingPdf(false);
+      setGeneratingPdf(false)
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -189,7 +195,7 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
           <p>Loading shift summary...</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -197,10 +203,7 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
       <div className="bg-white rounded-lg p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">End of Shift Summary</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
-          >
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">
             ×
           </button>
         </div>
@@ -211,15 +214,11 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
             <div className="text-blue-700 font-medium">Kegs Created</div>
           </div>
           <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-            <div className="text-3xl font-bold text-green-600">
-              {stats?.averageABV.toFixed(1) || 0}%
-            </div>
+            <div className="text-3xl font-bold text-green-600">{stats?.averageABV.toFixed(1) || 0}%</div>
             <div className="text-green-700 font-medium">Average ABV</div>
           </div>
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 text-center">
-            <div className="text-3xl font-bold text-purple-600">
-              {Object.keys(stats?.kegTypes || {}).length}
-            </div>
+            <div className="text-3xl font-bold text-purple-600">{Object.keys(stats?.kegTypes || {}).length}</div>
             <div className="text-purple-700 font-medium">Beer Styles</div>
           </div>
         </div>
@@ -244,9 +243,7 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
                   {Object.entries(stats.kegTypes).map(([style, count]) => (
                     <div key={style} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <span className="font-medium">{style}</span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium">
-                        {count}
-                      </span>
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium">{count}</span>
                     </div>
                   ))}
                 </div>
@@ -258,9 +255,7 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
                   {Object.entries(stats.kegSizes).map(([size, count]) => (
                     <div key={size} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <span className="font-medium">{size}</span>
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-medium">
-                        {count}
-                      </span>
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-medium">{count}</span>
                     </div>
                   ))}
                 </div>
@@ -279,9 +274,7 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
                           {keg.type} • {keg.abv}% ABV • {keg.keg_size}
                         </div>
                       </div>
-                      <div className="text-sm text-gray-500">
-                        {new Date(keg.created_at).toLocaleTimeString()}
-                      </div>
+                      <div className="text-sm text-gray-500">{new Date(keg.created_at).toLocaleTimeString()}</div>
                     </div>
                   ))}
                 </div>
@@ -324,5 +317,5 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

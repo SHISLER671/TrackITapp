@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
+import { createClient } from "@/lib/supabase/client"
 import type { UserRole, UserRoleRecord } from "@/lib/types"
 
 interface AuthContextType {
@@ -27,15 +27,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    const supabase = createClient()
+
     const initAuth = async () => {
       try {
-        if (!supabase) {
-          console.warn("[v0] Supabase not initialized - running in demo mode")
-          setLoading(false)
-          return
-        }
-
-        // Get initial session
         const {
           data: { session },
           error,
@@ -64,8 +59,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth()
 
-    if (!supabase) return
-
     try {
       const {
         data: { subscription },
@@ -89,10 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const fetchUserRole = async (userId: string) => {
-    if (!supabase) {
-      setLoading(false)
-      return
-    }
+    const supabase = createClient()
 
     try {
       const { data, error } = await supabase.from("user_roles").select("*").eq("user_id", userId).single()
@@ -108,8 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const handleSignOut = async () => {
-    if (!supabase) return
-
+    const supabase = createClient()
     await supabase.auth.signOut()
     setUser(null)
     setUserRole(null)

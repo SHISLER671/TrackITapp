@@ -1,64 +1,65 @@
-'use client';
+"use client"
 
-import React, { useState, useEffect } from 'react';
-import { getKegRecommendations } from '@/lib/ai-assistant';
-import { supabase } from '@/lib/supabase';
+import { useState, useEffect } from "react"
+import { getKegRecommendations } from "@/lib/ai-assistant"
+import { createClient } from "@/lib/supabase/client"
 
 interface AIRecommendationsProps {
-  onApply: (params: any) => void;
+  onApply: (params: any) => void
 }
 
 export default function AIRecommendations({ onApply }: AIRecommendationsProps) {
-  const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(false);
+  const [recommendations, setRecommendations] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [expanded, setExpanded] = useState(false)
 
   useEffect(() => {
-    loadRecommendations();
-  }, []);
+    loadRecommendations()
+  }, [])
 
   const loadRecommendations = async () => {
     try {
+      const supabase = createClient()
       const { data, error } = await supabase
-        .from('kegs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20);
+        .from("kegs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20)
 
-      if (error) throw error;
+      if (error) throw error
 
-      const recs = await getKegRecommendations(data || []);
-      setRecommendations(recs);
+      const recs = await getKegRecommendations(data || [])
+      setRecommendations(recs)
     } catch (error) {
-      console.error('Failed to load recommendations:', error);
+      console.error("Failed to load recommendations:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const applyRecommendation = (rec: any) => {
     // Parse recommendation to extract params
-    const params: any = {};
-    
-    const abvMatch = rec.suggestion.match(/(\d+\.?\d*)\s*%\s*ABV/i);
-    if (abvMatch) params.abv = parseFloat(abvMatch[1]);
-    
-    const ibuMatch = rec.suggestion.match(/(\d+)\s*IBU/i);
-    if (ibuMatch) params.ibu = parseInt(ibuMatch[1]);
-    
-    if (rec.suggestion.includes('IPA')) params.type = 'IPA';
-    else if (rec.suggestion.includes('Stout')) params.type = 'Stout';
-    else if (rec.suggestion.includes('Lager')) params.type = 'Lager';
-    else if (rec.suggestion.includes('Pale Ale')) params.type = 'Pale Ale';
-    else if (rec.suggestion.includes('Wheat')) params.type = 'Wheat Beer';
-    else if (rec.suggestion.includes('Sour')) params.type = 'Sour';
-    
-    if (rec.suggestion.includes('1/2')) params.keg_size = '1/2BBL';
-    else if (rec.suggestion.includes('1/4')) params.keg_size = '1/4BBL';
-    else if (rec.suggestion.includes('1/6')) params.keg_size = '1/6BBL';
-    
-    onApply(params);
-  };
+    const params: any = {}
+
+    const abvMatch = rec.suggestion.match(/(\d+\.?\d*)\s*%\s*ABV/i)
+    if (abvMatch) params.abv = Number.parseFloat(abvMatch[1])
+
+    const ibuMatch = rec.suggestion.match(/(\d+)\s*IBU/i)
+    if (ibuMatch) params.ibu = Number.parseInt(ibuMatch[1])
+
+    if (rec.suggestion.includes("IPA")) params.type = "IPA"
+    else if (rec.suggestion.includes("Stout")) params.type = "Stout"
+    else if (rec.suggestion.includes("Lager")) params.type = "Lager"
+    else if (rec.suggestion.includes("Pale Ale")) params.type = "Pale Ale"
+    else if (rec.suggestion.includes("Wheat")) params.type = "Wheat Beer"
+    else if (rec.suggestion.includes("Sour")) params.type = "Sour"
+
+    if (rec.suggestion.includes("1/2")) params.keg_size = "1/2BBL"
+    else if (rec.suggestion.includes("1/4")) params.keg_size = "1/4BBL"
+    else if (rec.suggestion.includes("1/6")) params.keg_size = "1/6BBL"
+
+    onApply(params)
+  }
 
   if (loading) {
     return (
@@ -68,11 +69,11 @@ export default function AIRecommendations({ onApply }: AIRecommendationsProps) {
           <span className="text-purple-700 font-medium">AI analyzing your brewing patterns...</span>
         </div>
       </div>
-    );
+    )
   }
 
   if (recommendations.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -86,7 +87,7 @@ export default function AIRecommendations({ onApply }: AIRecommendationsProps) {
           onClick={() => setExpanded(!expanded)}
           className="text-purple-600 hover:text-purple-700 text-sm font-medium"
         >
-          {expanded ? 'Show Less' : 'Show All'}
+          {expanded ? "Show Less" : "Show All"}
         </button>
       </div>
 
@@ -125,9 +126,9 @@ export default function AIRecommendations({ onApply }: AIRecommendationsProps) {
 
       {!expanded && recommendations.length > 1 && (
         <div className="mt-3 text-center text-sm text-purple-600">
-          +{recommendations.length - 1} more recommendation{recommendations.length - 1 !== 1 ? 's' : ''}
+          +{recommendations.length - 1} more recommendation{recommendations.length - 1 !== 1 ? "s" : ""}
         </div>
       )}
     </div>
-  );
+  )
 }
