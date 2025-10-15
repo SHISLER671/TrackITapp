@@ -10,7 +10,7 @@ import {
 // GET /api/deliveries/[id]/receipt - Generate receipt
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireAuth(request);
   
@@ -25,6 +25,7 @@ export async function GET(
     const format = searchParams.get('format') || 'json'; // json, text, html
     
     // Get delivery with all details
+    const { id } = await params;
     const { data: delivery, error } = await supabase
       .from('deliveries')
       .select(`
@@ -34,7 +35,7 @@ export async function GET(
         brewery:brewery_id(id, name, logo_url),
         delivery_items(*)
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
     
     if (error) {

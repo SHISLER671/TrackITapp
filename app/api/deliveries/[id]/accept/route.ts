@@ -13,7 +13,7 @@ const acceptDeliverySchema = z.object({
 // POST /api/deliveries/[id]/accept - Accept delivery (restaurant manager only)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireAuth(request);
   
@@ -38,10 +38,11 @@ export async function POST(
     const validatedData = acceptDeliverySchema.parse(body);
     
     // Get delivery
+    const { id } = await params;
     const { data: delivery, error: fetchError } = await supabase
       .from('deliveries')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
     
     if (fetchError || !delivery) {
@@ -82,7 +83,7 @@ export async function POST(
         console.error('Blockchain transfer error:', blockchainError);
         // In production, you might want to retry or queue this
         // For now, we'll continue and log the error
-        txHash = null;
+        txHash = undefined;
       }
     }
     
@@ -95,7 +96,7 @@ export async function POST(
         blockchain_tx_hash: txHash,
         accepted_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select(`
         *,
         driver:driver_id(id, user_id),

@@ -8,7 +8,7 @@ import { calculateVarianceStatus } from '@/lib/types';
 // POST /api/kegs/[id]/retire - Retire (burn) a keg
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireRestaurantManager(request);
   
@@ -20,10 +20,11 @@ export async function POST(
   
   try {
     // Get keg
+    const { id } = await params;
     const { data: keg, error: fetchError } = await supabase
       .from('kegs')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
     
     if (fetchError || !keg) {
@@ -51,14 +52,14 @@ export async function POST(
     
     // Get final pint count from POS
     const posAdapter = initPOSAdapter();
-    const finalPintsSold = await posAdapter.getPintCount(params.id);
+    const finalPintsSold = await posAdapter.getPintCount(id);
     
     // Calculate variance
     const variance = keg.expected_pints - finalPintsSold;
     const varianceStatus = calculateVarianceStatus(variance);
     
     // Burn keg token (mock or real blockchain)
-    await burnKeg(params.id);
+    await burnKeg(id);
     
     // Update keg as empty
     const { data: updatedKeg, error: updateError } = await supabase
@@ -69,7 +70,7 @@ export async function POST(
         variance,
         variance_status: varianceStatus,
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
     
@@ -80,7 +81,7 @@ export async function POST(
     // If variance is WARNING or CRITICAL, trigger analysis
     if (varianceStatus === 'WARNING' || varianceStatus === 'CRITICAL') {
       // Trigger variance analysis (will be handled by analyze endpoint)
-      await fetch(`${request.nextUrl.origin}/api/kegs/${params.id}/analyze`, {
+      await fetch(`${request.nextUrl.origin}/api/kegs/${id}/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

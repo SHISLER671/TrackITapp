@@ -8,7 +8,7 @@ import ErrorMessage from '@/components/ErrorMessage';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
 import CameraCapture from '@/components/CameraCapture';
 import AIRecommendations from '@/components/AIRecommendations';
-import { CreateKegFormData, KegSize } from '@/lib/types';
+import { CreateKegFormData, KegSize, BeerStyle } from '@/lib/types';
 import { BEER_STYLES, KEG_SIZES } from '@/lib/constants';
 import { getContractAddress } from '@/lib/thirdweb';
 
@@ -119,7 +119,7 @@ function NewKegContent() {
         const reader = new FileReader();
         reader.onload = (e) => {
           if (e.target?.result) {
-            setPhotos(prev => [...prev, e.target.result as string]);
+            setPhotos(prev => [...prev, e.target!.result as string]);
           }
         };
         reader.readAsDataURL(file);
@@ -237,7 +237,7 @@ function NewKegContent() {
       const response = await fetch('/api/kegs');
       if (response.ok) {
         const data = await response.json();
-        const uniqueNames = [...new Set(data.kegs?.map((k: any) => k.name) || [])];
+        const uniqueNames = [...new Set(data.kegs?.map((k: any) => k.name) || [])] as string[];
         setPastKegNames(uniqueNames);
       }
     } catch (error) {
@@ -517,7 +517,7 @@ function NewKegContent() {
               </label>
               <select
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, type: e.target.value as BeerStyle })}
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >

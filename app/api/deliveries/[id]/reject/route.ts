@@ -11,7 +11,7 @@ const rejectDeliverySchema = z.object({
 // POST /api/deliveries/[id]/reject - Reject delivery (restaurant manager only)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireAuth(request);
   
@@ -36,10 +36,11 @@ export async function POST(
     const validatedData = rejectDeliverySchema.parse(body);
     
     // Get delivery
+    const { id } = await params;
     const { data: delivery, error: fetchError } = await supabase
       .from('deliveries')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
     
     if (fetchError || !delivery) {
@@ -74,7 +75,7 @@ export async function POST(
           ? `${delivery.notes}\n\nREJECTED: ${validatedData.reason}`
           : `REJECTED: ${validatedData.reason}`,
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
     

@@ -6,7 +6,7 @@ import { ProtectedRoute, useAuth } from '@/components/AuthProvider';
 import NavBar from '@/components/NavBar';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
-import { CreateKegFormData, KegSize } from '@/lib/types';
+import { CreateKegFormData, KegSize, BeerStyle } from '@/lib/types';
 import { BEER_STYLES, KEG_SIZES } from '@/lib/constants';
 
 export default function BatchKegPage() {
@@ -196,7 +196,7 @@ function BatchKegContent() {
               </label>
               <select
                 value={baseForm.type}
-                onChange={(e) => setBaseForm({ ...baseForm, type: e.target.value })}
+                onChange={(e) => setBaseForm({ ...baseForm, type: e.target.value as BeerStyle })}
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >

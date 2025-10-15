@@ -85,7 +85,7 @@ export function initPOSAdapter(): POSAdapter {
 }
 
 // Export adapters and types
-export { POSAdapter, POSConfig, POSError } from './adapter';
+export type { POSAdapter, POSConfig, POSError } from './adapter';
 export { RevelAdapter } from './revel';
 export { SquareAdapter } from './square';
 export { ToastAdapter } from './toast';

@@ -13,7 +13,7 @@ const scanSchema = z.object({
 // POST /api/kegs/[id]/scan - Record keg scan
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireAuth(request);
   
@@ -30,10 +30,11 @@ export async function POST(
     const validatedData = scanSchema.parse(body);
     
     // Get keg
+    const { id } = await params;
     const { data: keg, error: fetchError } = await supabase
       .from('kegs')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
     
     if (fetchError || !keg) {
@@ -47,7 +48,7 @@ export async function POST(
     const { data: scan, error: scanError } = await supabase
       .from('keg_scans')
       .insert({
-        keg_id: params.id,
+        keg_id: id,
         scanned_by: userRole.id,
         location: validatedData.location,
         timestamp: validatedData.timestamp,
@@ -67,7 +68,7 @@ export async function POST(
         last_location: validatedData.location,
         current_holder: userRole.id,
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
     
@@ -76,7 +77,7 @@ export async function POST(
     }
     
     // Update blockchain metadata (mock or real)
-    await updateKegMetadata(params.id, {
+    await updateKegMetadata(id, {
       name: keg.name,
       type: keg.type,
       abv: keg.abv,

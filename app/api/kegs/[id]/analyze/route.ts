@@ -13,7 +13,7 @@ const analyzeSchema = z.object({
 // POST /api/kegs/[id]/analyze - Trigger variance analysis
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireBrewerOrManager(request);
   
@@ -30,10 +30,11 @@ export async function POST(
     const validatedData = analyzeSchema.parse(body);
     
     // Get keg with scan history
+    const { id } = await params;
     const { data: keg, error: kegError } = await supabase
       .from('kegs')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
     
     if (kegError || !keg) {
@@ -59,7 +60,7 @@ export async function POST(
     const { data: scans, error: scansError } = await supabase
       .from('keg_scans')
       .select('timestamp, location, scanned_by')
-      .eq('keg_id', params.id)
+      .eq('keg_id', id)
       .order('timestamp', { ascending: true });
     
     if (scansError) {
@@ -67,17 +68,23 @@ export async function POST(
     }
     
     // Run AI analysis
+    const mappedScans = (scans || []).map(scan => ({
+      timestamp: scan.timestamp,
+      location: scan.location,
+      scannedBy: scan.scanned_by
+    }));
+    
     const analysis = await analyzeVariance(
       keg,
       validatedData.variance,
-      scans || []
+      mappedScans
     );
     
     // Store analysis report
     const { data: report, error: reportError } = await supabase
       .from('variance_reports')
       .insert({
-        keg_id: params.id,
+        keg_id: id,
         variance_amount: validatedData.variance,
         status: validatedData.varianceStatus,
         ai_analysis: analysis,

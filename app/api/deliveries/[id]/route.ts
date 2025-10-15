@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 // GET /api/deliveries/[id] - Get single delivery
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireAuth(request);
   
@@ -16,6 +16,7 @@ export async function GET(
   const { user, userRole } = authResult;
   
   try {
+    const { id } = await params;
     const { data: delivery, error } = await supabase
       .from('deliveries')
       .select(`
@@ -28,7 +29,7 @@ export async function GET(
           keg:keg_id(*)
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
     
     if (error) {
@@ -68,7 +69,7 @@ export async function GET(
 // DELETE /api/deliveries/[id] - Cancel delivery (driver only, if still pending)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireAuth(request);
   
@@ -87,10 +88,11 @@ export async function DELETE(
   
   try {
     // Get existing delivery
+    const { id } = await params;
     const { data: existingDelivery, error: fetchError } = await supabase
       .from('deliveries')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
     
     if (fetchError || !existingDelivery) {
@@ -120,7 +122,7 @@ export async function DELETE(
     const { error } = await supabase
       .from('deliveries')
       .update({ status: 'CANCELLED' })
-      .eq('id', params.id);
+      .eq('id', id);
     
     if (error) {
       throw error;

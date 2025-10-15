@@ -15,7 +15,7 @@ const updateKegSchema = z.object({
 // GET /api/kegs/[id] - Get single keg
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireAuth(request);
   
@@ -26,10 +26,11 @@ export async function GET(
   const { user, userRole } = authResult;
   
   try {
+    const { id } = await params;
     const { data: keg, error } = await supabase
       .from('kegs')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
     
     if (error) {
@@ -69,7 +70,7 @@ export async function GET(
 // PATCH /api/kegs/[id] - Update keg
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireAuth(request);
   
@@ -86,10 +87,11 @@ export async function PATCH(
     const validatedData = updateKegSchema.parse(body);
     
     // Get existing keg
+    const { id } = await params;
     const { data: existingKeg, error: fetchError } = await supabase
       .from('kegs')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
     
     if (fetchError || !existingKeg) {
@@ -116,7 +118,7 @@ export async function PATCH(
     const { data: keg, error } = await supabase
       .from('kegs')
       .update(validatedData)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
     
