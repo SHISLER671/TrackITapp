@@ -31,4 +31,3 @@ export function LoadingPage({ message = 'Loading...' }: { message?: string }) {
     </div>
   );
 }
-

@@ -123,4 +123,3 @@ export class RevelAdapter implements POSAdapter {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
-

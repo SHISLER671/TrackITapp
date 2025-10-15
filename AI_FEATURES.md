@@ -56,7 +56,7 @@ New Keg creation page (top of form)
   - Time of year (seasonal beers)
 
 ### Example Recommendations
-```
+\`\`\`
 🤖 AI Recommendations
 
 IPA at 6.5% ABV in 1/6BBL
@@ -68,7 +68,7 @@ Imperial Stout at 9.5% ABV, 70 IBU
 Reason: Winter season - darker, stronger beers are popular
 75% confidence
 [Apply]
-```
+\`\`\`
 
 ---
 
@@ -92,7 +92,7 @@ End Shift Summary modal
 - **Brewing tips**: Random helpful tip each shift
 
 ### Example Output
-```
+\`\`\`
 🤖 AI Insights
 
 Great shift! You brewed 8 kegs with an average ABV of 6.2%. 
@@ -102,7 +102,7 @@ You brewed 3 different styles today - nice variety!
 These are moderate strength brews - great for year-round drinking!
 
 💡 Tip: Clean tap lines every 2 weeks for best flavor
-```
+\`\`\`
 
 ---
 
@@ -123,7 +123,7 @@ Keg retirement/variance reports
 - **Severity assessment** (normal, warning, critical)
 
 ### Example Analysis
-```
+\`\`\`
 Variance Analysis for Hazy IPA:
 
 ⚠️ 12 pints unaccounted for (9.7% variance).
@@ -135,7 +135,7 @@ Possible causes:
 • POS tracking errors (drinks not rung up)
 
 Recommendation: Review pour techniques and ensure all drinks are logged in POS.
-```
+\`\`\`
 
 ---
 
@@ -220,13 +220,16 @@ When you add your xAI API key, these features will be even more powerful:
 
 ### How to Enable Live AI
 1. Get API key from https://x.ai/api
-2. Add to `.env.local`:
-   ```
-   NEXT_PUBLIC_XAI_API_KEY=your_key_here
-   NEXT_PUBLIC_USE_LIVE_AI=true
-   ```
-3. Restart app
-4. Enjoy enhanced AI features!
+2. Add to Vercel environment variables (in the Vars section):
+   \`\`\`
+   XAI_API_KEY=your_key_here
+   USE_LIVE_AI=true
+   \`\`\`
+3. Implement server-side API routes in `/app/api/ai/`
+4. Update `lib/ai-assistant.ts` to call these routes
+5. Enjoy enhanced AI features!
+
+**Note**: API keys should never be exposed to the client. All AI API calls must go through server-side routes.
 
 ---
 

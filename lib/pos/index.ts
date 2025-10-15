@@ -90,4 +90,3 @@ export { RevelAdapter } from './revel';
 export { SquareAdapter } from './square';
 export { ToastAdapter } from './toast';
 export { mockPOSStorage } from './mock-data';
-

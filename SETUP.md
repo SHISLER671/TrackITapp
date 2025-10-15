@@ -15,7 +15,7 @@ This guide provides detailed instructions for setting up all external services a
 
 The application works out of the box with mock implementations. No external services required for development!
 
-```bash
+\`\`\`bash
 # Install dependencies
 npm install
 
@@ -24,7 +24,7 @@ cp .env.example .env.local
 
 # Run development server
 npm run dev
-```
+\`\`\`
 
 The app will run with:
 - Mock blockchain (simulated token minting/burning)
@@ -65,10 +65,10 @@ This creates:
 
 Add to `.env.local`:
 
-```env
+\`\`\`env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
+\`\`\`
 
 ### 5. Create Test Users
 
@@ -83,7 +83,7 @@ In Supabase dashboard:
 
 4. Insert corresponding user_roles records in SQL Editor:
 
-```sql
+\`\`\`sql
 -- Create test brewery
 INSERT INTO breweries (name) VALUES ('Test Brewery');
 
@@ -95,7 +95,7 @@ INSERT INTO user_roles (user_id, role, brewery_id) VALUES
   ('brewer-user-id', 'BREWER', 'brewery-id'),
   ('driver-user-id', 'DRIVER', 'brewery-id'),
   ('manager-user-id', 'RESTAURANT_MANAGER', NULL);
-```
+\`\`\`
 
 ## Thirdweb Setup
 
@@ -124,11 +124,11 @@ INSERT INTO user_roles (user_id, role, brewery_id) VALUES
 
 ### 4. Update Environment Variables
 
-```env
+\`\`\`env
 THIRDWEB_CLIENT_ID=your-client-id
 KEG_CONTRACT_ADDRESS=0x...your-contract-address
 USE_LIVE_BLOCKCHAIN=true
-```
+\`\`\`
 
 ### 5. Configure Metadata
 
@@ -154,10 +154,10 @@ In Thirdweb dashboard:
 
 ### 2. Update Environment Variables
 
-```env
+\`\`\`env
 GEMINI_API_KEY=your-gemini-api-key
 USE_LIVE_GEMINI=true
-```
+\`\`\`
 
 ### 3. Test Integration
 
@@ -170,13 +170,13 @@ The AI will now generate real variance analysis reports instead of using mock da
 1. Get API credentials from Revel account
 2. Update `.env.local`:
 
-```env
+\`\`\`env
 POS_SYSTEM=revel
 USE_LIVE_POS=true
 POS_API_KEY=your-revel-api-key
 POS_API_SECRET=your-revel-secret
 POS_BASE_URL=https://your-domain.revelup.com
-```
+\`\`\`
 
 ### Square POS
 
@@ -185,12 +185,12 @@ POS_BASE_URL=https://your-domain.revelup.com
 3. Get Access Token
 4. Update `.env.local`:
 
-```env
+\`\`\`env
 POS_SYSTEM=square
 USE_LIVE_POS=true
 POS_API_KEY=your-square-access-token
 POS_MERCHANT_ID=your-merchant-id
-```
+\`\`\`
 
 ### Toast POS
 
@@ -198,13 +198,13 @@ POS_MERCHANT_ID=your-merchant-id
 2. Get API credentials
 3. Update `.env.local`:
 
-```env
+\`\`\`env
 POS_SYSTEM=toast
 USE_LIVE_POS=true
 POS_API_KEY=your-toast-api-key
 POS_BASE_URL=https://api.toasttab.com
 POS_MERCHANT_ID=your-restaurant-id
-```
+\`\`\`
 
 ## Deployment
 
@@ -212,13 +212,13 @@ POS_MERCHANT_ID=your-restaurant-id
 
 1. **Push to GitHub**
 
-```bash
+\`\`\`bash
 git init
 git add .
 git commit -m "Initial commit"
 git remote add origin your-repo-url
 git push -u origin main
-```
+\`\`\`
 
 2. **Import to Vercel**
 
@@ -235,7 +235,7 @@ git push -u origin main
 
    In Vercel project settings → Environment Variables, add all variables from `.env.local`:
 
-   ```
+   \`\`\`
    NEXT_PUBLIC_SUPABASE_URL
    NEXT_PUBLIC_SUPABASE_ANON_KEY
    THIRDWEB_CLIENT_ID
@@ -249,7 +249,7 @@ git push -u origin main
    POS_API_SECRET
    POS_BASE_URL
    POS_MERCHANT_ID
-   ```
+   \`\`\`
 
 4. **Deploy**
 
@@ -263,7 +263,7 @@ git push -u origin main
 
 ### Alternative: Docker Deployment
 
-```dockerfile
+\`\`\`dockerfile
 # Dockerfile
 FROM node:18-alpine AS builder
 
@@ -283,14 +283,14 @@ COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 3000
 CMD ["node", "server.js"]
-```
+\`\`\`
 
 Build and run:
 
-```bash
+\`\`\`bash
 docker build -t keg-tracker .
 docker run -p 3000:3000 --env-file .env.local keg-tracker
-```
+\`\`\`
 
 ## Troubleshooting
 
@@ -357,4 +357,3 @@ Before going to production:
 - [ ] Database backups are configured
 - [ ] Error logging is set up
 - [ ] Mobile camera permissions tested
-

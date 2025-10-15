@@ -31,7 +31,7 @@ The Keg Delivery System provides **fast, accountable, blockchain-backed delivery
 
 New tables added in `002_deliveries_system.sql`:
 
-```sql
+\`\`\`sql
 deliveries
 ├── id (UUID)
 ├── driver_id → user_roles
@@ -57,7 +57,7 @@ accounting_exports
 ├── delivery_count
 ├── total_deposit
 └── file_url
-```
+\`\`\`
 
 ### API Endpoints
 
@@ -89,14 +89,14 @@ accounting_exports
    - Pending delivery appears at top with red "REQUIRES ACTION" badge
 
 3. **Review Delivery** (10 seconds)
-   ```
+   \`\`\`
    Delivery from Hop City Brewing
    ├── Keg 1: Hazy IPA (1/2BBL) - $30 deposit
    ├── Keg 2: Pilsner (1/4BBL) - $30 deposit
    └── Keg 3: Stout (1/2BBL) - $30 deposit
    
    Total: 3 kegs, $90 deposit
-   ```
+   \`\`\`
 
 4. **Accept & Sign** (5 seconds)
    - Tap "Accept & Sign" button
@@ -127,11 +127,11 @@ accounting_exports
 
 1. Opens `/accounting` page
 2. Views delivery history table:
-   ```
+   \`\`\`
    Date       | Brewery    | Kegs | Deposit | Blockchain TX
    10/14/2025 | Hop City   | 3    | $90.00  | 0xabc123...
    10/12/2025 | River Brew | 5    | $150.00 | 0xdef456...
-   ```
+   \`\`\`
 3. Filters by date range (e.g., "October 2025")
 4. Clicks "Export CSV"
 5. Opens CSV in Excel/QuickBooks
@@ -151,7 +151,7 @@ accounting_exports
 
 Located in `/lib/thirdweb.ts`:
 
-```typescript
+\`\`\`typescript
 // To enable live blockchain:
 // 1. Set env: USE_LIVE_BLOCKCHAIN=true
 // 2. Set env: THIRDWEB_CLIENT_ID=your_client_id
@@ -167,13 +167,13 @@ export async function transferKegNFTs(
   // Transfers NFTs from driver wallet to restaurant wallet
   // Returns transaction hash from Base blockchain
 }
-```
+\`\`\`
 
 ## 📄 Receipt System
 
 ### Receipt Data Structure
 
-```typescript
+\`\`\`typescript
 {
   receipt_number: "RCP-ABC12345",
   date: "October 14, 2025",
@@ -194,27 +194,27 @@ export async function transferKegNFTs(
   blockchain_explorer_url: "https://basescan.org/tx/0xabc123...",
   manager_signature: "manager-sig-1728937200"
 }
-```
+\`\`\`
 
 ### Receipt Formats
 
 #### 1. JSON (API Integration)
-```bash
+\`\`\`bash
 curl /api/deliveries/123/receipt?format=json
-```
+\`\`\`
 
 #### 2. HTML (Email/Browser)
-```bash
+\`\`\`bash
 curl /api/deliveries/123/receipt?format=html
-```
+\`\`\`
 - Formatted with CSS
 - Includes blockchain verification section
 - Can be printed or emailed
 
 #### 3. Plain Text (Terminal/SMS)
-```bash
+\`\`\`bash
 curl /api/deliveries/123/receipt?format=text
-```
+\`\`\`
 - ASCII-formatted
 - Good for simple systems
 
@@ -222,10 +222,10 @@ curl /api/deliveries/123/receipt?format=text
 
 ### CSV Export Format
 
-```csv
+\`\`\`csv
 Receipt #,Date,Time,Brewery,Restaurant ID,Total Kegs,Total Deposit,Blockchain TX Hash,Blockchain Explorer
 RCP-ABC12345,10/14/2025,2:45 PM,Hop City Brewing,rest-abc123,3,90.00,0xabc123...,https://basescan.org/tx/0xabc123...
-```
+\`\`\`
 
 ### Integration with Accounting Software
 
@@ -240,11 +240,11 @@ The CSV format is designed to import into:
 ### Month-End Reconciliation Process
 
 1. **Export deliveries for period**
-   ```
+   \`\`\`
    Filter: October 1-31, 2025
    Status: Accepted only
    Export → keg-deliveries-october-2025.csv
-   ```
+   \`\`\`
 
 2. **Match against brewery invoices**
    - Compare delivery dates
@@ -257,12 +257,12 @@ The CSV format is designed to import into:
    - Review rejection reasons (if any)
 
 4. **Generate deposit reconciliation**
-   ```
+   \`\`\`
    Total Kegs Received: 45
    Total Deposits Owed: $1,350.00
    Returns This Month: 38
    Net Deposit Balance: $210.00
-   ```
+   \`\`\`
 
 ## 🎨 UI Components
 
@@ -295,7 +295,7 @@ Features:
 
 ### Environment Variables
 
-```bash
+\`\`\`bash
 # Database (Supabase)
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
@@ -304,15 +304,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 USE_LIVE_BLOCKCHAIN=false
 THIRDWEB_CLIENT_ID=your_client_id
 KEG_CONTRACT_ADDRESS=your_contract_address
-```
+\`\`\`
 
 ### Database Migration
 
 Run the new migration:
-```bash
+\`\`\`bash
 # In your Supabase SQL editor or via migration tool:
 psql -f supabase/migrations/002_deliveries_system.sql
-```
+\`\`\`
 
 ## 📱 Mobile Optimization
 
@@ -413,4 +413,3 @@ You now have a complete delivery system that:
 - ✅ Resolves disputes instantly with blockchain proof
 
 **It's faster than paper, more secure than paper, and better for accounting than paper.** 🚀
-

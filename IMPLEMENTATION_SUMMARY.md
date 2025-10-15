@@ -6,7 +6,7 @@ This document outlines the comprehensive implementation of the Beer Keg Tracker 
 
 ## 📦 Project Structure
 
-```
+\`\`\`
 keg-tracker/
 ├── app/
 │   ├── api/
@@ -75,7 +75,7 @@ keg-tracker/
 ├── README.md
 ├── SETUP.md
 └── package.json
-```
+\`\`\`
 
 ## 🎯 Core Features Implemented
 
@@ -273,11 +273,11 @@ keg-tracker/
 
 All external services use feature flags for easy switching:
 
-```typescript
+\`\`\`typescript
 USE_LIVE_BLOCKCHAIN=false  // Mock blockchain by default
 USE_LIVE_POS=false         // Mock POS by default
 USE_LIVE_GEMINI=false      // Mock AI by default
-```
+\`\`\`
 
 ## 📊 Variance Analysis
 
@@ -342,4 +342,3 @@ The application is ready to deploy to Vercel with:
 ✅ **Mobile-optimized user experience**
 
 The Beer Keg Tracker is ready for testing and deployment!
-

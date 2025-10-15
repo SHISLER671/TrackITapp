@@ -44,4 +44,3 @@ export class POSError extends Error {
     this.name = 'POSError';
   }
 }
-

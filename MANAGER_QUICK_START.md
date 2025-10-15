@@ -5,12 +5,12 @@
 When your driver arrives with kegs, here's what happens:
 
 ### Step 1: Open Your Dashboard (3 seconds)
-```
+\`\`\`
 Open app → Already logged in with Face ID
-```
+\`\`\`
 
 ### Step 2: See Pending Delivery (2 seconds)
-```
+\`\`\`
 🚚 DELIVERY ARRIVED
 from Hop City Brewing
 
@@ -19,25 +19,25 @@ from Hop City Brewing
 ✓ Stout (1/2BBL) - $30 deposit
 
 Total: 3 kegs, $90 deposit
-```
+\`\`\`
 
 ### Step 3: Accept & Sign (5 seconds)
-```
+\`\`\`
 [Accept & Sign] ← Big green button
         ↓
    Face ID prompt
         ↓
       ✓ Done!
-```
+\`\`\`
 
 ### Step 4: Confirmation (automatic)
-```
+\`\`\`
 ✅ Delivery accepted!
 
 Blockchain TX: 0xabc123...
 
 Kegs added to your inventory.
-```
+\`\`\`
 
 **Total: 15 seconds** ⚡
 
@@ -51,24 +51,24 @@ Kegs added to your inventory.
    - Click "Accounting" in top nav
 
 2. **Set Date Range**
-   ```
+   \`\`\`
    Start: October 1, 2025
    End: October 31, 2025
-   ```
+   \`\`\`
 
 3. **Export CSV**
    - Click "📊 Export CSV" button
    - Opens in Excel/QuickBooks
 
 4. **Reconcile Against Invoices**
-   ```
+   \`\`\`
    CSV shows:
    - Date of each delivery
    - Brewery name
    - Number of kegs
    - Deposit amount
    - Blockchain proof link
-   ```
+   \`\`\`
 
 5. **Done!**
 
@@ -141,4 +141,3 @@ Check the main documentation: `DELIVERY_SYSTEM.md`
 ---
 
 **That's it! You're ready to accept deliveries faster than paper while having better accountability.** 🎉
-

@@ -133,4 +133,3 @@ export default function QRScanner({ onScan, onError }: QRScannerProps) {
     </div>
   );
 }
-

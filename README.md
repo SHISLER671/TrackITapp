@@ -38,27 +38,27 @@ The Beer Keg Tracker reduces keg loss from the industry average of 18% to under 
 
 ### 1. Clone and Install
 
-```bash
+\`\`\`bash
 git clone <repository-url>
 cd keg-tracker
 npm install
-```
+\`\`\`
 
 ### 2. Configure Environment
 
 Copy `.env.example` to `.env.local` and configure:
 
-```bash
+\`\`\`bash
 cp .env.example .env.local
-```
+\`\`\`
 
 The default configuration uses mock implementations for all services, allowing you to run and test the app immediately.
 
 ### 3. Run Development Server
 
-```bash
+\`\`\`bash
 npm run dev
-```
+\`\`\`
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
@@ -162,7 +162,7 @@ See [SETUP.md](./SETUP.md) for detailed deployment instructions.
 
 ## 🧑‍💻 Development Scripts
 
-```bash
+\`\`\`bash
 # Run development server with Turbopack
 npm run dev
 
@@ -171,7 +171,7 @@ npm run build
 
 # Start production server
 npm start
-```
+\`\`\`
 
 ## 🔒 Security
 

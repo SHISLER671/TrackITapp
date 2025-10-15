@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Keg Tracker - Brewery Keg Management System',
   description: 'Blockchain-verified keg tracking system for breweries',
+    generator: 'v0.app'
 };
 
 export default function RootLayout({

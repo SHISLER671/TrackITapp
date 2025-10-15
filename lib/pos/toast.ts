@@ -125,4 +125,3 @@ export class ToastAdapter implements POSAdapter {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
-

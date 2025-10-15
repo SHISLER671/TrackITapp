@@ -30,12 +30,12 @@ Your home screen shows:
 4. Walk to your assigned keg pile
 5. Tap "📷 Scan Keg"
 6. **Scan each keg's QR code one by one:**
-   ```
+   \`\`\`
    Scan Keg #1 → "✓ Keg-001 loaded"
    Scan Keg #2 → "✓ Keg-002 loaded"
    Scan Keg #3 → "✓ Keg-003 loaded"
    ...
-   ```
+   \`\`\`
 7. As you scan, physically load them onto truck
 8. Dashboard updates: "Kegs On Truck: 12"
 
@@ -68,11 +68,11 @@ Your home screen shows:
    - "Call when outside - back entrance"
 5. Tap "📦 Create Delivery"
 6. **Confirmation:** 
-   ```
+   \`\`\`
    ✅ Delivery created!
    3 kegs ready for drop-off.
    The restaurant manager will be notified.
-   ```
+   \`\`\`
 
 **What Happens:**
 - Creates entry in `deliveries` table (status: PENDING)
@@ -120,12 +120,12 @@ Your home screen shows:
 
 Repeat Parts 2 & 3 for each stop on your route:
 
-```
+\`\`\`
 Stop 1: Create delivery → Drop off → Wait for acceptance
 Stop 2: Create delivery → Drop off → Wait for acceptance
 Stop 3: Create delivery → Drop off → Wait for acceptance
 ...
-```
+\`\`\`
 
 **Route Optimization Tips:**
 - Create all deliveries at start of day (if known)
@@ -179,7 +179,7 @@ Stop 3: Create delivery → Drop off → Wait for acceptance
 ## 📊 What You See vs What Manager Sees
 
 ### Your View (Driver Dashboard)
-```
+\`\`\`
 Kegs On Truck: 12
 Pending Deliveries: 1 (waiting for acceptance)
 Completed Today: 2
@@ -187,10 +187,10 @@ Completed Today: 2
 Recent Deliveries:
 - Restaurant abc123 | 3 kegs | ACCEPTED ✅
 - Restaurant def456 | 5 kegs | PENDING ⏳
-```
+\`\`\`
 
 ### Manager's View (Restaurant Dashboard)
-```
+\`\`\`
 Pending Deliveries: 1 REQUIRES ACTION
 
 🚚 Delivery Arrived from Hop City Brewing
@@ -199,7 +199,7 @@ Pending Deliveries: 1 REQUIRES ACTION
 Total: 2 kegs, $60 deposit
 
 [Accept & Sign] [Reject]
-```
+\`\`\`
 
 ---
 
@@ -372,4 +372,3 @@ Total: 2 kegs, $60 deposit
 ---
 
 **You're all set! The app does the tracking, you do the driving.** 🚚
-

@@ -11,17 +11,17 @@ Get up and running in 5 minutes! 🚀
 
 ### 1. Install Dependencies
 
-```bash
+\`\`\`bash
 npm install
-```
+\`\`\`
 
 This installs all required packages including Next.js, Supabase, Tailwind CSS, and more.
 
 ### 2. Start Development Server
 
-```bash
+\`\`\`bash
 npm run dev
-```
+\`\`\`
 
 Open [http://localhost:3000](http://localhost:3000) to see the app!
 
@@ -103,24 +103,24 @@ The app supports three roles:
 
 Edit `lib/constants.ts`:
 
-```typescript
+\`\`\`typescript
 export const KEG_SIZES = [
   { size: '1/6BBL', expected_pints: 41, ... },
   // Add your custom sizes here
 ];
-```
+\`\`\`
 
 ### Add Beer Styles
 
 Edit `lib/constants.ts`:
 
-```typescript
+\`\`\`typescript
 export const BEER_STYLES = [
   'IPA',
   'Your Custom Style',
   // ...
 ];
-```
+\`\`\`
 
 ## 🐛 Troubleshooting
 
@@ -157,7 +157,7 @@ export const BEER_STYLES = [
 ### For Live Services
 Enable real integrations by updating `.env.local`:
 
-```env
+\`\`\`env
 # Enable live blockchain
 USE_LIVE_BLOCKCHAIN=true
 THIRDWEB_CLIENT_ID=your_client_id
@@ -171,7 +171,7 @@ POS_API_KEY=your_key
 # Enable live AI
 USE_LIVE_GEMINI=true
 GEMINI_API_KEY=your_key
-```
+\`\`\`
 
 See [SETUP.md](./SETUP.md) for detailed instructions on each service.
 
@@ -194,10 +194,10 @@ See [SETUP.md](./SETUP.md) for detailed instructions on each service.
 
 When you're ready for production:
 
-```bash
+\`\`\`bash
 npm run build    # Test production build
 npm start        # Run production locally
-```
+\`\`\`
 
 Then deploy to Vercel (see [SETUP.md](./SETUP.md) for details).
 
@@ -211,4 +211,3 @@ Need help? Check out:
 - [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) - What's been built
 
 Happy brewing! 🍺
-

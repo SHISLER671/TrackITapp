@@ -151,4 +151,3 @@ export async function updatePassword(newPassword: string) {
     throw new Error(error.message);
   }
 }
-

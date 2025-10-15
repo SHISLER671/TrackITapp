@@ -202,4 +202,3 @@ function simulateDelay(ms: number): Promise<void> {
 export function getContractAddress(): string {
   return KEG_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
 }
-

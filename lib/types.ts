@@ -232,4 +232,3 @@ export interface CreateDeliveryFormData {
   keg_ids: string[];
   notes?: string;
 }
-

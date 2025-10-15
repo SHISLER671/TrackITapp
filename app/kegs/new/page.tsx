@@ -752,4 +752,3 @@ function NewKegContent() {
     </div>
   );
 }
-

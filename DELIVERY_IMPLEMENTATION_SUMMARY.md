@@ -84,7 +84,7 @@ You now have a **complete blockchain-backed delivery acceptance system** that ma
 
 1. **Manager opens restaurant dashboard** on phone
 2. **Sees pending delivery** at top of page (auto-refreshes every 30s):
-   ```
+   \`\`\`
    🚚 DELIVERY ARRIVED
    from Hop City Brewing
    
@@ -95,7 +95,7 @@ You now have a **complete blockchain-backed delivery acceptance system** that ma
    Total: 3 kegs, $90 deposit
    
    [Accept & Sign]  [Reject]
-   ```
+   \`\`\`
 
 3. **Taps "Accept & Sign"** button
 4. **Confirms with Face ID** (or thumbprint)
@@ -116,11 +116,11 @@ You now have a **complete blockchain-backed delivery acceptance system** that ma
 
 1. Open `/accounting` page
 2. See summary:
-   ```
+   \`\`\`
    Total Deliveries: 45
    Total Kegs: 135
    Total Deposits: $4,050
-   ```
+   \`\`\`
 
 3. Set date range: October 1-31
 4. Click "Export CSV"
@@ -146,7 +146,7 @@ You now have a **complete blockchain-backed delivery acceptance system** that ma
 ### Immutable Receipts
 
 Every accepted delivery creates:
-```json
+\`\`\`json
 {
   "delivery_id": "abc-123",
   "blockchain_tx_hash": "0xabc123...",
@@ -154,7 +154,7 @@ Every accepted delivery creates:
   "kegs_transferred": ["KEG-001", "KEG-002", "KEG-003"],
   "timestamp": "2025-10-14T14:45:00Z"
 }
-```
+\`\`\`
 
 ### Why This Matters
 
@@ -171,10 +171,10 @@ Every accepted delivery creates:
 ## 🚀 Next Steps to Use This
 
 ### 1. Run Database Migration
-```bash
+\`\`\`bash
 # In Supabase SQL editor or via CLI
 psql -f supabase/migrations/002_deliveries_system.sql
-```
+\`\`\`
 
 ### 2. Test the Flow
 1. Sign in as a driver
@@ -220,12 +220,12 @@ psql -f supabase/migrations/002_deliveries_system.sql
 
 ### Environment Variables (Optional)
 
-```bash
+\`\`\`bash
 # Blockchain (defaults to mock mode)
 USE_LIVE_BLOCKCHAIN=false  # Set to 'true' for production
 THIRDWEB_CLIENT_ID=your_client_id
 KEG_CONTRACT_ADDRESS=your_contract_address
-```
+\`\`\`
 
 ### Mock Mode vs Production
 
@@ -334,4 +334,3 @@ Ready when you are:
 ---
 
 **Questions? Check the docs or test the flow yourself!**
-

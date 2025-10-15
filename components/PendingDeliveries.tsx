@@ -272,4 +272,3 @@ export default function PendingDeliveries({ onDeliveryAccepted }: PendingDeliver
     </div>
   );
 }
-

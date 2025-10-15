@@ -274,4 +274,3 @@ function DeliveryDetailContent({ deliveryId }: { deliveryId: string }) {
     </div>
   );
 }
-

@@ -317,4 +317,3 @@ COMMENT ON TABLE variance_reports IS 'Stores AI-generated variance analysis repo
 COMMENT ON COLUMN kegs.abv IS 'ABV stored as integer * 10 (e.g., 6.5% = 65)';
 COMMENT ON COLUMN kegs.expected_pints IS 'Auto-calculated based on keg_size, never manually entered';
 COMMENT ON COLUMN kegs.variance IS 'Calculated as expected_pints - pints_sold';
-

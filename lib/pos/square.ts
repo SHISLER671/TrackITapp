@@ -146,4 +146,3 @@ export class SquareAdapter implements POSAdapter {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
-

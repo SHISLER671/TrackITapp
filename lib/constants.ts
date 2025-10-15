@@ -110,4 +110,3 @@ export const UI_MESSAGES = {
   INSTALLATION_SUCCESS: 'Keg installed on tap successfully.',
   ANALYSIS_TRIGGERED: 'Variance analysis has been initiated.',
 } as const;
-

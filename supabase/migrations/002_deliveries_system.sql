@@ -252,4 +252,3 @@ COMMENT ON TABLE delivery_items IS 'Individual kegs in a delivery with snapshot 
 COMMENT ON TABLE accounting_exports IS 'Tracks CSV exports for accounting reconciliation';
 COMMENT ON COLUMN deliveries.blockchain_tx_hash IS 'Thirdweb NFT transfer transaction hash - immutable receipt';
 COMMENT ON COLUMN deliveries.deposit_amount IS 'Total deposit value for all kegs in delivery';
-

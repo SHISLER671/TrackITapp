@@ -312,4 +312,3 @@ export function generateHTMLReceipt(receiptData: ReceiptData): string {
 </html>
 `;
 }
-

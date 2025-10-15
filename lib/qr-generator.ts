@@ -197,4 +197,3 @@ export async function generateBatchQRCodes(
   
   return results;
 }
-

@@ -15,9 +15,9 @@
 - Repeat for each keg (one by one)
 - **That's it!** Kegs now show in "Kegs On Truck"
 
-```
+\`\`\`
 Scan → ✓ → Scan next → ✓ → Scan next → ✓
-```
+\`\`\`
 
 ---
 
@@ -116,7 +116,7 @@ The manager does this:
 
 ## 🔄 Full Day Example
 
-```
+\`\`\`
 8:00 AM  - Clock in, grab phone
 8:05 AM  - Scan 12 kegs (2 min)
 8:07 AM  - Drive to Stop 1
@@ -131,7 +131,7 @@ The manager does this:
 4:10 PM  - Hand phone back, clock out
 
 Total app time: ~8 minutes
-```
+\`\`\`
 
 ---
 
@@ -165,4 +165,3 @@ You both save time, less hassle, everyone's happy.
 ---
 
 **That's it! Scan → Create Delivery → Manager Accepts → You're Done!** 🚀
-

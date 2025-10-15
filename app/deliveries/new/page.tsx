@@ -325,4 +325,3 @@ function NewDeliveryContent() {
     </div>
   );
 }
-
