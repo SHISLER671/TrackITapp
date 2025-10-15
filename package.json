@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
     "@thirdweb-dev/sdk": "^4.0.99",
     "@types/qrcode": "^1.5.5",
