@@ -1,32 +1,18 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { AuthProvider } from '@/components/AuthProvider';
-import AIVoiceAssistant from '@/components/AIVoiceAssistant';
-import AIChatAssistant from '@/components/AIChatAssistant';
-
-const inter = Inter({ subsets: ['latin'] });
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: 'Keg Tracker - Brewery Keg Management System',
-  description: 'Blockchain-verified keg tracking system for breweries',
-    generator: 'v0.app'
-};
+  title: "Keg Tracker",
+  description: "Track beer kegs across the supply chain",
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>
-          {children}
-          <AIVoiceAssistant />
-          <AIChatAssistant />
-        </AuthProvider>
-      </body>
+      <body>{children}</body>
     </html>
-  );
+  )
 }
