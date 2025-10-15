@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "Keg Tracker",
   description: "Track beer kegs across the supply chain",
+    generator: 'v0.app'
 }
 
 export default function RootLayout({
@@ -16,3 +17,6 @@ export default function RootLayout({
     </html>
   )
 }
+
+
+import './globals.css'
