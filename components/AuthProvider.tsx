@@ -27,42 +27,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!supabase) {
-      console.warn("Supabase not initialized - running in demo mode")
-      setLoading(false)
-      return
+    const initAuth = async () => {
+      try {
+        if (!supabase) {
+          console.warn("[v0] Supabase not initialized - running in demo mode")
+          setLoading(false)
+          return
+        }
+
+        // Get initial session
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession()
+
+        if (error) {
+          console.error("[v0] Session error:", error)
+          setLoading(false)
+          return
+        }
+
+        console.log("[v0] Initial session:", session)
+        setUser(session?.user ?? null)
+        if (session?.user) {
+          console.log("[v0] User authenticated:", session.user.id)
+          await fetchUserRole(session.user.id)
+        } else {
+          console.log("[v0] No user session")
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error("[v0] Auth initialization error:", error)
+        setLoading(false)
+      }
     }
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session:", session)
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        console.log("User authenticated:", session.user.id)
-        fetchUserRole(session.user.id)
-      } else {
-        console.log("No user session")
-        setLoading(false)
-      }
-    })
+    initAuth()
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state change:", event, session)
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        console.log("User authenticated via state change:", session.user.id)
-        fetchUserRole(session.user.id)
-      } else {
-        console.log("No user session via state change")
-        setUserRole(null)
-        setLoading(false)
-      }
-    })
+    if (!supabase) return
 
-    return () => subscription.unsubscribe()
+    try {
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log("[v0] Auth state change:", event, session)
+        setUser(session?.user ?? null)
+        if (session?.user) {
+          console.log("[v0] User authenticated via state change:", session.user.id)
+          await fetchUserRole(session.user.id)
+        } else {
+          console.log("[v0] No user session via state change")
+          setUserRole(null)
+          setLoading(false)
+        }
+      })
+
+      return () => subscription.unsubscribe()
+    } catch (error) {
+      console.error("[v0] Auth listener error:", error)
+    }
   }, [])
 
   const fetchUserRole = async (userId: string) => {
@@ -77,9 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error
       setUserRole(data)
     } catch (error) {
-      console.error("Error fetching user role:", error)
-      console.error("User ID:", userId)
-      console.error("Error details:", JSON.stringify(error, null, 2))
+      console.error("[v0] Error fetching user role:", error)
       setUserRole(null)
     } finally {
       setLoading(false)
