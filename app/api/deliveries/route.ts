@@ -102,13 +102,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify all kegs are currently held by the driver
-    const invalidKegs = kegs.filter((keg) => keg.current_holder !== userRole.id)
+    const invalidKegs = kegs.filter((keg: any) => keg.current_holder !== userRole.id)
     if (invalidKegs.length > 0) {
       return NextResponse.json({ error: "You can only deliver kegs currently in your possession" }, { status: 403 })
     }
 
     // All kegs should be from the same brewery
-    const breweryIds = [...new Set(kegs.map((k) => k.brewery_id))]
+    const breweryIds = [...new Set(kegs.map((k: any) => k.brewery_id))]
     if (breweryIds.length > 1) {
       return NextResponse.json({ error: "All kegs must be from the same brewery" }, { status: 400 })
     }
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create delivery items
-    const deliveryItems = kegs.map((keg) => ({
+    const deliveryItems = kegs.map((keg: any) => ({
       delivery_id: delivery.id,
       keg_id: keg.id,
       keg_name: keg.name,

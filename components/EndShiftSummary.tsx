@@ -44,13 +44,13 @@ export default function EndShiftSummary({ onClose }: EndShiftSummaryProps) {
 
       const kegs = data || []
       const kegsCreated = kegs.length
-      const totalABV = kegs.reduce((sum, keg) => sum + keg.abv, 0)
+      const totalABV = kegs.reduce((sum: number, keg: any) => sum + keg.abv, 0)
       const averageABV = kegsCreated > 0 ? totalABV / kegsCreated : 0
 
       const kegTypes: { [key: string]: number } = {}
       const kegSizes: { [key: string]: number } = {}
 
-      kegs.forEach((keg) => {
+      kegs.forEach((keg: any) => {
         kegTypes[keg.type] = (kegTypes[keg.type] || 0) + 1
         kegSizes[keg.keg_size] = (kegSizes[keg.keg_size] || 0) + 1
       })

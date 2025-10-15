@@ -11,7 +11,7 @@ const scanSchema = z.object({
 })
 
 // POST /api/kegs/[id]/scan - Record keg scan
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authResult = await requireAuth(request)
 
   if (authResult instanceof NextResponse) {
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
   const { user, userRole } = authResult
 
-  const supabase = createClient()
+  const supabase = await createClient()
 
   try {
     const body = await request.json()
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     const validatedData = scanSchema.parse(body)
 
     // Get keg
-    const { id } = params
+    const { id } = await params
     const { data: keg, error: fetchError } = await supabase.from("kegs").select("*").eq("id", id).single()
 
     if (fetchError || !keg) {

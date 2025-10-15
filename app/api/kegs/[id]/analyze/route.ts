@@ -57,7 +57,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     // Run AI analysis
-    const mappedScans = (scans || []).map((scan) => ({
+    const mappedScans = (scans || []).map((scan: any) => ({
       timestamp: scan.timestamp,
       location: scan.location,
       scannedBy: scan.scanned_by,
