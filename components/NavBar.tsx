@@ -48,6 +48,7 @@ export function NavBar() {
     { name: 'Deliveries', href: '/deliveries', icon: Truck },
     { name: 'Restaurants', href: '/restaurants', icon: Building2 },
     { name: 'Reports', href: '/reports', icon: BarChart3 },
+    { name: 'Integrations', href: '/integrations/pos', icon: Settings },
   ]
 
   const roleDashboards = [
