@@ -43,6 +43,7 @@ export function NavBar() {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: Home },
+    { name: 'Scan', href: '/scan', icon: Search },
     { name: 'Kegs', href: '/kegs', icon: Package },
     { name: 'Deliveries', href: '/deliveries', icon: Truck },
     { name: 'Restaurants', href: '/restaurants', icon: Building2 },

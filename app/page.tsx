@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { KegCardCompact } from "@/components/KegCard"
 import { useAuth } from "@/components/AuthProvider"
 import { useRouter } from "next/navigation"
-import { Package, Truck, Building2, BarChart3, TrendingUp, AlertTriangle } from "lucide-react"
+import { Package, Truck, Building2, BarChart3, TrendingUp, AlertTriangle, Search } from "lucide-react"
 
 export default function Home() {
   const { user, loading, supabaseConfigured } = useAuth()
@@ -123,6 +123,13 @@ export default function Home() {
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
                     <Button 
+                      onClick={() => router.push('/scan')}
+                      className="h-20 flex flex-col items-center justify-center space-y-2 bg-green-600 hover:bg-green-700"
+                    >
+                      <Search className="h-6 w-6" />
+                      <span>Scan QR Code</span>
+                    </Button>
+                    <Button 
                       onClick={() => router.push('/kegs/new')}
                       className="h-20 flex flex-col items-center justify-center space-y-2 bg-blue-600 hover:bg-blue-700"
                     >
@@ -144,14 +151,6 @@ export default function Home() {
                     >
                       <Truck className="h-6 w-6" />
                       <span>Deliveries</span>
-                    </Button>
-                    <Button 
-                      onClick={() => router.push('/reports')}
-                      variant="outline"
-                      className="h-20 flex flex-col items-center justify-center space-y-2"
-                    >
-                      <TrendingUp className="h-6 w-6" />
-                      <span>Reports</span>
                     </Button>
                   </div>
                 </CardContent>
