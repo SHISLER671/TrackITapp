@@ -35,11 +35,13 @@ export interface AIResponse {
 const FREE_MODELS = {
   tier1: {
     groq: 'https://api.groq.com/openai/v1/chat/completions',
+    openrouter: 'https://openrouter.ai/api/v1/chat/completions',
     huggingface: 'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium',
     replicate: 'https://api.replicate.com/v1/predictions'
   },
   tier2: {
     groq: 'https://api.groq.com/openai/v1/chat/completions', // Llama 3.1 70B
+    openrouter: 'https://openrouter.ai/api/v1/chat/completions',
     together: 'https://api.together.xyz/v1/chat/completions',
     replicate: 'https://api.replicate.com/v1/predictions'
   }
@@ -48,6 +50,7 @@ const FREE_MODELS = {
 // Tier 1 Models (Free)
 const TIER1_MODELS = {
   groq: 'llama-3.1-8b-instant', // Free tier: 6,000 requests/day
+  openrouter: 'microsoft/phi-3-mini-128k-instruct:free', // Free model on OpenRouter
   huggingface: 'microsoft/DialoGPT-medium',
   replicate: 'meta/llama-2-7b-chat'
 }
@@ -55,6 +58,7 @@ const TIER1_MODELS = {
 // Tier 2 Models (Free/Low-cost)
 const TIER2_MODELS = {
   groq: 'llama-3.1-70b-versatile', // $0.59/1M tokens (very cheap)
+  openrouter: 'meta-llama/llama-3.1-8b-instruct:free', // Free Llama 3.1 8B on OpenRouter
   together: 'meta-llama/Llama-3.1-70B-Instruct-Turbo',
   replicate: 'meta/llama-2-70b-chat'
 }
@@ -107,7 +111,14 @@ class AIAssistant {
 
   // Tier 1: Lightweight processing (Free models)
   private async processTier1(request: AIRequest): Promise<AIResponse> {
-    // Try Groq free tier first
+    // Try OpenRouter first (best free tier)
+    try {
+      return await this.callOpenRouterAPI(request, TIER1_MODELS.openrouter, 1)
+    } catch (error) {
+      console.warn('OpenRouter API failed, trying Groq:', error)
+    }
+
+    // Try Groq free tier as backup
     if (this.apiKey) {
       try {
         return await this.callGroqAPI(request, TIER1_MODELS.groq, 1)
@@ -122,6 +133,13 @@ class AIAssistant {
 
   // Tier 2: Medium processing (Free/Low-cost models)
   private async processTier2(request: AIRequest): Promise<AIResponse> {
+    // Try OpenRouter Llama 3.1 8B first (free)
+    try {
+      return await this.callOpenRouterAPI(request, TIER2_MODELS.openrouter, 2)
+    } catch (error) {
+      console.warn('OpenRouter 8B failed, trying Groq:', error)
+    }
+
     // Try Groq 70B model (very cheap)
     if (this.apiKey) {
       try {
@@ -139,6 +157,44 @@ class AIAssistant {
   private async processTier3(request: AIRequest): Promise<AIResponse> {
     // For now, route complex requests to Tier 2 with enhanced prompting
     return await this.processTier2Fallback(request, true)
+  }
+
+  // Call OpenRouter API (Free models available)
+  private async callOpenRouterAPI(request: AIRequest, model: string, tier: number): Promise<AIResponse> {
+    const response = await fetch('/api/ai/openrouter', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: 'system',
+            content: this.getSystemPrompt(request.type, tier)
+          },
+          {
+            role: 'user',
+            content: this.formatPrompt(request)
+          }
+        ],
+        max_tokens: tier === 1 ? 150 : 300,
+        temperature: 0.7
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error(`OpenRouter API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return {
+      success: true,
+      response: data.choices[0].message.content,
+      tier,
+      model,
+      confidence: 0.88
+    }
   }
 
   // Call Groq API (Free tier available)
