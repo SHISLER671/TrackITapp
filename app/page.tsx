@@ -1,46 +1,63 @@
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
 export default function Home() {
   return (
-    <main style={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      minHeight: '100vh',
-      fontFamily: 'system-ui, sans-serif',
-      padding: '2rem'
-    }}>
-      <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: '#2563eb' }}>
-        🍺 Keg Tracker
-      </h1>
-      <p style={{ fontSize: '1.2rem', color: '#64748b', textAlign: 'center', maxWidth: '600px' }}>
-        Track beer kegs across the supply chain from brewery to restaurant
-      </p>
+    <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="text-center mb-8">
+        <h1 className="text-6xl font-bold text-blue-600 mb-4">
+          🍺 Keg Tracker
+        </h1>
+        <p className="text-xl text-gray-600 max-w-2xl">
+          Track beer kegs across the supply chain from brewery to restaurant
+        </p>
+      </div>
       
-      <div style={{ 
-        marginTop: '2rem', 
-        padding: '2rem', 
-        border: '2px solid #e2e8f0', 
-        borderRadius: '8px',
-        backgroundColor: '#f8fafc'
-      }}>
-        <h2 style={{ color: '#1e293b', marginBottom: '1rem' }}>Features Coming Soon:</h2>
-        <ul style={{ color: '#475569', lineHeight: '1.6' }}>
-          <li>✅ QR Code scanning</li>
-          <li>✅ Delivery tracking</li>
-          <li>✅ Inventory management</li>
-          <li>✅ Real-time updates</li>
-          <li>✅ Mobile-first design</li>
-        </ul>
+      <Card className="w-full max-w-2xl mb-8">
+        <CardHeader>
+          <CardTitle className="text-2xl text-gray-800">Features Coming Soon:</CardTitle>
+          <CardDescription>
+            Building a comprehensive keg tracking solution
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-2">
+              <span className="text-green-500">✅</span>
+              <span>QR Code scanning</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-green-500">✅</span>
+              <span>Delivery tracking</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-green-500">✅</span>
+              <span>Inventory management</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-green-500">✅</span>
+              <span>Real-time updates</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-green-500">✅</span>
+              <span>Mobile-first design</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex flex-col sm:flex-row gap-4">
+        <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+          Get Started
+        </Button>
+        <Button variant="outline" size="lg">
+          Learn More
+        </Button>
       </div>
 
-      <div style={{ 
-        marginTop: '2rem', 
-        fontSize: '0.9rem', 
-        color: '#64748b',
-        textAlign: 'center'
-      }}>
+      <div className="mt-8 text-center text-sm text-gray-500">
         <p>🚀 Successfully deployed to Vercel!</p>
-        <p>Built with Next.js 15 and React 19</p>
+        <p>Built with Next.js 15, React 19 & Tailwind CSS</p>
       </div>
     </main>
   )
