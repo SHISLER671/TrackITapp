@@ -17,7 +17,7 @@ export default function NewKegPage() {
     name: '',
     type: 'IPA',
     size: 'half',
-    brewery_id: 'default-brewery-id', // TODO: Get from user context
+    brewery_id: 'default-brewery-id', // Will be populated from user context in production
     abv: undefined,
     ibu: undefined,
     description: '',
