@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { QRScanner } from '@/components/QRScanner'
 import { QRCodeDisplay } from '@/components/QRCodeDisplay'
+import { BlockchainStatus } from '@/components/BlockchainStatus'
 import { useAuth } from '@/components/AuthProvider'
 import { Keg } from '@/lib/types'
-import { Plus, Search, Package, MapPin } from 'lucide-react'
+import { Plus, Search, Package, MapPin, Shield } from 'lucide-react'
 import Link from 'next/link'
 
 export default function KegsPage() {
@@ -198,13 +199,24 @@ export default function KegsPage() {
                   <CardDescription>{keg.type} • {keg.size}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600">
-                      <strong>ABV:</strong> {keg.abv || 'N/A'}%
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <strong>QR Code:</strong> {keg.qr_code.slice(-8)}...
-                    </p>
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-600">
+                        <strong>ABV:</strong> {keg.abv || 'N/A'}%
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <strong>QR Code:</strong> {keg.qr_code.slice(-8)}...
+                      </p>
+                    </div>
+                    
+                    {/* Blockchain Status */}
+                    <div className="border-t pt-2">
+                      <BlockchainStatus 
+                        keg={keg as any} 
+                        className="!shadow-none !border-0 !p-0"
+                      />
+                    </div>
+
                     <Button
                       variant="outline"
                       size="sm"

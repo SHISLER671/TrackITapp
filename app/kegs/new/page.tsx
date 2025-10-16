@@ -29,7 +29,8 @@ export default function NewKegPage() {
     setError(null)
 
     try {
-      const response = await fetch('/api/kegs', {
+      // Step 1: Create keg in database
+      const kegResponse = await fetch('/api/kegs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,13 +38,55 @@ export default function NewKegPage() {
         body: JSON.stringify(formData),
       })
 
-      const result = await response.json()
+      const kegResult = await kegResponse.json()
 
-      if (result.error) {
-        setError(result.error)
-      } else {
-        router.push('/kegs')
+      if (kegResult.error) {
+        setError(kegResult.error)
+        return
       }
+
+      // Step 2: Mint NFT for the keg
+      console.log('🎯 Minting NFT for keg:', kegResult.data)
+      const nftResponse = await fetch('/api/blockchain/mint', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          keg: kegResult.data
+        }),
+      })
+
+      const nftResult = await nftResponse.json()
+
+      if (nftResult.success) {
+        console.log('✅ NFT minted successfully:', {
+          tokenId: nftResult.tokenId,
+          txHash: nftResult.txHash,
+          blockchain: nftResult.blockchain
+        })
+
+        // Update keg with NFT information
+        const updateResponse = await fetch(`/api/kegs/${kegResult.data.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            nft_token_id: nftResult.tokenId,
+            nft_tx_hash: nftResult.txHash,
+            blockchain_status: 'MINTED'
+          }),
+        })
+
+        if (updateResponse.ok) {
+          console.log('✅ Keg updated with NFT information')
+        }
+      } else {
+        console.warn('⚠️ NFT minting failed, but keg created:', nftResult.error)
+      }
+
+      router.push('/kegs')
     } catch (err) {
       setError('Failed to create keg')
       console.error('Create keg error:', err)
