@@ -1,7 +1,10 @@
-'use client'
+"use client"
 
-import { createContext, useContext, useEffect, useState } from 'react'
-import type { User } from '@supabase/supabase-js'
+import type React from "react"
+
+import { createContext, useContext, useEffect, useState } from "react"
+import type { User } from "@supabase/supabase-js"
+import { createClient } from "@/lib/supabase/client"
 
 type AuthContextType = {
   user: User | null
@@ -18,7 +21,7 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    throw new Error("useAuth must be used within an AuthProvider")
   }
   return context
 }
@@ -30,13 +33,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check if Supabase is configured
-    const hasSupabaseConfig = !!(
-      process.env.NEXT_PUBLIC_SUPABASE_URL && 
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    )
-    
+    const hasSupabaseConfig = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+
     setSupabaseConfigured(hasSupabaseConfig)
-    
+
     if (!hasSupabaseConfig) {
       setLoading(false)
       return
@@ -44,7 +44,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Initialize Supabase
     try {
-      const { createClient } = require('@/lib/supabase/client')
       const supabase = createClient()
 
       const {
@@ -56,14 +55,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       return () => subscription.unsubscribe()
     } catch (error) {
-      console.error('Supabase initialization error:', error)
+      console.error("Supabase initialization error:", error)
       setLoading(false)
     }
   }, [])
 
-  return (
-    <AuthContext.Provider value={{ user, loading, supabaseConfigured }}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={{ user, loading, supabaseConfigured }}>{children}</AuthContext.Provider>
 }

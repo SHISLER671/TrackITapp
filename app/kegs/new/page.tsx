@@ -79,7 +79,7 @@ export default function NewKegPage() {
           <CardHeader>
             <CardTitle>Keg Information</CardTitle>
             <CardDescription>
-              Enter the details for the new keg. A QR code will be generated automatically.
+              Enter the details for the new keg
             </CardDescription>
           </CardHeader>
           <CardContent>

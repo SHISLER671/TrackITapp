@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { QRScanner } from '@/components/QRScanner'
 import { QRCodeDisplay } from '@/components/QRCodeDisplay'
 import { useAuth } from '@/components/AuthProvider'
 import { Keg } from '@/lib/types'
-import { Plus, Package, MapPin, Search, X } from 'lucide-react'
+import { Plus, Search, Package, MapPin } from 'lucide-react'
 import Link from 'next/link'
 
 export default function KegsPage() {
@@ -14,7 +15,7 @@ export default function KegsPage() {
   const [kegs, setKegs] = useState<Keg[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [showScanner, setShowScanner] = useState(false)
   const [selectedKeg, setSelectedKeg] = useState<Keg | null>(null)
 
   useEffect(() => {
@@ -40,11 +41,26 @@ export default function KegsPage() {
     }
   }
 
-  const filteredKegs = kegs.filter(keg =>
-    keg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    keg.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    keg.qr_code.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const handleQRScan = async (qrCode: string) => {
+    try {
+      // Extract keg ID from QR code (assuming format: keg-{uuid})
+      const kegId = qrCode.replace('keg-', '')
+      
+      // Fetch keg details
+      const response = await fetch(`/api/kegs/${kegId}`)
+      const result = await response.json()
+      
+      if (result.error) {
+        setError(`Keg not found: ${qrCode}`)
+      } else {
+        setSelectedKeg(result.data)
+        setShowScanner(false)
+      }
+    } catch (err) {
+      setError('Failed to fetch keg details')
+      console.error('Keg fetch error:', err)
+    }
+  }
 
   if (!supabaseConfigured) {
     return (
@@ -68,25 +84,17 @@ export default function KegsPage() {
             <h1 className="text-3xl font-bold text-gray-900">Keg Management</h1>
             <p className="text-gray-600 mt-1">Track and manage your beer kegs</p>
           </div>
-          <Button asChild>
-            <Link href="/kegs/new">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Keg
-            </Link>
-          </Button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <input
-              type="text"
-              placeholder="Search kegs by name, type, or QR code..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="flex gap-2">
+            <Button onClick={() => setShowScanner(true)}>
+              <Search className="h-4 w-4 mr-2" />
+              Scan QR Code
+            </Button>
+            <Button asChild>
+              <Link href="/kegs/new">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Keg
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -160,26 +168,20 @@ export default function KegsPage() {
                 </CardContent>
               </Card>
             ))
-          ) : filteredKegs.length === 0 ? (
+          ) : kegs.length === 0 ? (
             <div className="col-span-full text-center py-12">
               <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {searchTerm ? 'No kegs found matching your search' : 'No kegs found'}
-              </h3>
-              <p className="text-gray-600 mb-4">
-                {searchTerm ? 'Try a different search term' : 'Get started by adding your first keg'}
-              </p>
-              {!searchTerm && (
-                <Button asChild>
-                  <Link href="/kegs/new">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add First Keg
-                  </Link>
-                </Button>
-              )}
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No kegs found</h3>
+              <p className="text-gray-600 mb-4">Get started by adding your first keg</p>
+              <Button asChild>
+                <Link href="/kegs/new">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add First Keg
+                </Link>
+              </Button>
             </div>
           ) : (
-            filteredKegs.map((keg) => (
+            kegs.map((keg) => (
               <Card key={keg.id} className="hover:shadow-md transition-shadow">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
@@ -203,25 +205,28 @@ export default function KegsPage() {
                     <p className="text-sm text-gray-600">
                       <strong>QR Code:</strong> {keg.qr_code.slice(-8)}...
                     </p>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        View Details
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        onClick={() => setSelectedKeg(keg)}
-                      >
-                        View QR
-                      </Button>
-                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setSelectedKeg(keg)}
+                    >
+                      View Details
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
             ))
           )}
         </div>
+
+        {/* QR Scanner Modal */}
+        {showScanner && (
+          <QRScanner
+            onScan={handleQRScan}
+            onClose={() => setShowScanner(false)}
+          />
+        )}
 
         {/* QR Code Display Modal */}
         {selectedKeg && (
@@ -234,7 +239,7 @@ export default function KegsPage() {
                   size="icon"
                   onClick={() => setSelectedKeg(null)}
                 >
-                  <X className="h-4 w-4" />
+                  ×
                 </Button>
               </CardHeader>
               <CardContent>
