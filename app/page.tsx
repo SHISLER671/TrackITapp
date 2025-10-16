@@ -81,23 +81,14 @@ export default function Home() {
 
       <div className="flex flex-col sm:flex-row gap-4">
         {user ? (
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button 
-              size="lg" 
-              className="bg-blue-600 hover:bg-blue-700"
-              onClick={() => router.push('/kegs')}
-            >
-              Manage Kegs
-            </Button>
-            <Button 
-              onClick={handleSignOut}
-              variant="outline" 
-              size="lg"
-              className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
-            >
-              Sign Out
-            </Button>
-          </div>
+          <Button 
+            onClick={handleSignOut}
+            variant="outline" 
+            size="lg"
+            className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+          >
+            Sign Out
+          </Button>
         ) : (
           <>
             <Button 
