@@ -1,13 +1,13 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Breadcrumb } from '@/components/NavBar'
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  AlertTriangle, 
+import { useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Breadcrumb } from "@/components/NavBar"
+import {
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
   CheckCircle,
   BarChart3,
   Brain,
@@ -20,13 +20,15 @@ import {
   Eye,
   Lightbulb,
   Clock,
-  DollarSign
-} from 'lucide-react'
+  DollarSign,
+  Package,
+  Truck,
+} from "lucide-react"
 
 interface VarianceAlert {
   id: string
-  type: 'inventory' | 'sales' | 'delivery' | 'quality' | 'cost'
-  severity: 'low' | 'medium' | 'high' | 'critical'
+  type: "inventory" | "sales" | "delivery" | "quality" | "cost"
+  severity: "low" | "medium" | "high" | "critical"
   title: string
   description: string
   currentValue: number
@@ -36,7 +38,7 @@ interface VarianceAlert {
   impact: string
   recommendations: string[]
   detectedAt: Date
-  status: 'new' | 'investigating' | 'resolved' | 'false_positive'
+  status: "new" | "investigating" | "resolved" | "false_positive"
   kegId?: string
   restaurantId?: string
   aiConfidence: number
@@ -53,127 +55,154 @@ interface VarianceTrend {
 export default function VarianceAnalysisPage() {
   const [varianceAlerts, setVarianceAlerts] = useState<VarianceAlert[]>([
     {
-      id: 'var-001',
-      type: 'inventory',
-      severity: 'high',
-      title: 'Unexpected Keg Return Rate',
-      description: 'Keg return rate is 15% higher than expected for Downtown Pub location',
+      id: "var-001",
+      type: "inventory",
+      severity: "high",
+      title: "Unexpected Keg Return Rate",
+      description: "Keg return rate is 15% higher than expected for Downtown Pub location",
       currentValue: 85,
       expectedValue: 100,
       variance: -15,
       variancePercentage: -15,
-      impact: 'Potential revenue loss of $2,400/month',
+      impact: "Potential revenue loss of $2,400/month",
       recommendations: [
-        'Investigate keg handling procedures at location',
-        'Schedule maintenance check on keg return equipment',
-        'Review delivery schedule for timing issues'
+        "Investigate keg handling procedures at location",
+        "Schedule maintenance check on keg return equipment",
+        "Review delivery schedule for timing issues",
       ],
-      detectedAt: new Date('2024-10-16T10:30:00'),
-      status: 'new',
-      restaurantId: 'rest-001',
-      aiConfidence: 0.87
+      detectedAt: new Date("2024-10-16T10:30:00"),
+      status: "new",
+      restaurantId: "rest-001",
+      aiConfidence: 0.87,
     },
     {
-      id: 'var-002',
-      type: 'sales',
-      severity: 'medium',
-      title: 'Sales Volume Anomaly',
-      description: 'Summer IPA sales dropped 25% below forecast for past 3 days',
+      id: "var-002",
+      type: "sales",
+      severity: "medium",
+      title: "Sales Volume Anomaly",
+      description: "Summer IPA sales dropped 25% below forecast for past 3 days",
       currentValue: 75,
       expectedValue: 100,
       variance: -25,
       variancePercentage: -25,
-      impact: 'Potential inventory buildup and cash flow impact',
+      impact: "Potential inventory buildup and cash flow impact",
       recommendations: [
-        'Check POS system for data accuracy',
-        'Verify promotional campaign effectiveness',
-        'Consider temporary price adjustment'
+        "Check POS system for data accuracy",
+        "Verify promotional campaign effectiveness",
+        "Consider temporary price adjustment",
       ],
-      detectedAt: new Date('2024-10-16T09:15:00'),
-      status: 'investigating',
-      kegId: 'keg-001',
-      aiConfidence: 0.72
+      detectedAt: new Date("2024-10-16T09:15:00"),
+      status: "investigating",
+      kegId: "keg-001",
+      aiConfidence: 0.72,
     },
     {
-      id: 'var-003',
-      type: 'quality',
-      severity: 'critical',
-      title: 'Temperature Fluctuation Detected',
-      description: 'Keg temperature exceeded safe range during delivery transit',
+      id: "var-003",
+      type: "quality",
+      severity: "critical",
+      title: "Temperature Fluctuation Detected",
+      description: "Keg temperature exceeded safe range during delivery transit",
       currentValue: 45,
       expectedValue: 38,
       variance: 7,
       variancePercentage: 18.4,
-      impact: 'Product quality at risk - potential customer complaints',
+      impact: "Product quality at risk - potential customer complaints",
       recommendations: [
-        'Immediate quality check of affected kegs',
-        'Review delivery vehicle temperature controls',
-        'Notify customers of potential quality issue'
+        "Immediate quality check of affected kegs",
+        "Review delivery vehicle temperature controls",
+        "Notify customers of potential quality issue",
       ],
-      detectedAt: new Date('2024-10-16T08:45:00'),
-      status: 'new',
-      kegId: 'keg-002',
-      aiConfidence: 0.95
-    }
+      detectedAt: new Date("2024-10-16T08:45:00"),
+      status: "new",
+      kegId: "keg-002",
+      aiConfidence: 0.95,
+    },
   ])
 
   const [trends] = useState<VarianceTrend[]>([
-    { date: '2024-10-10', totalVariances: 8, criticalVariances: 2, resolvedVariances: 6, avgVariancePercentage: -12.5 },
-    { date: '2024-10-11', totalVariances: 12, criticalVariances: 1, resolvedVariances: 8, avgVariancePercentage: -8.3 },
-    { date: '2024-10-12', totalVariances: 6, criticalVariances: 0, resolvedVariances: 5, avgVariancePercentage: -5.2 },
-    { date: '2024-10-13', totalVariances: 15, criticalVariances: 3, resolvedVariances: 10, avgVariancePercentage: -15.8 },
-    { date: '2024-10-14', totalVariances: 9, criticalVariances: 1, resolvedVariances: 7, avgVariancePercentage: -9.1 },
-    { date: '2024-10-15', totalVariances: 11, criticalVariances: 2, resolvedVariances: 8, avgVariancePercentage: -11.4 },
-    { date: '2024-10-16', totalVariances: 7, criticalVariances: 1, resolvedVariances: 3, avgVariancePercentage: -13.7 }
+    { date: "2024-10-10", totalVariances: 8, criticalVariances: 2, resolvedVariances: 6, avgVariancePercentage: -12.5 },
+    { date: "2024-10-11", totalVariances: 12, criticalVariances: 1, resolvedVariances: 8, avgVariancePercentage: -8.3 },
+    { date: "2024-10-12", totalVariances: 6, criticalVariances: 0, resolvedVariances: 5, avgVariancePercentage: -5.2 },
+    {
+      date: "2024-10-13",
+      totalVariances: 15,
+      criticalVariances: 3,
+      resolvedVariances: 10,
+      avgVariancePercentage: -15.8,
+    },
+    { date: "2024-10-14", totalVariances: 9, criticalVariances: 1, resolvedVariances: 7, avgVariancePercentage: -9.1 },
+    {
+      date: "2024-10-15",
+      totalVariances: 11,
+      criticalVariances: 2,
+      resolvedVariances: 8,
+      avgVariancePercentage: -11.4,
+    },
+    { date: "2024-10-16", totalVariances: 7, criticalVariances: 1, resolvedVariances: 3, avgVariancePercentage: -13.7 },
   ])
 
-  const [selectedFilter, setSelectedFilter] = useState<string>('all')
+  const [selectedFilter, setSelectedFilter] = useState<string>("all")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'text-red-600 bg-red-100 border-red-200'
-      case 'high': return 'text-orange-600 bg-orange-100 border-orange-200'
-      case 'medium': return 'text-yellow-600 bg-yellow-100 border-yellow-200'
-      case 'low': return 'text-green-600 bg-green-100 border-green-200'
-      default: return 'text-gray-600 bg-gray-100 border-gray-200'
+      case "critical":
+        return "text-red-600 bg-red-100 border-red-200"
+      case "high":
+        return "text-orange-600 bg-orange-100 border-orange-200"
+      case "medium":
+        return "text-yellow-600 bg-yellow-100 border-yellow-200"
+      case "low":
+        return "text-green-600 bg-green-100 border-green-200"
+      default:
+        return "text-gray-600 bg-gray-100 border-gray-200"
     }
   }
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'inventory': return <Package className="h-4 w-4" />
-      case 'sales': return <DollarSign className="h-4 w-4" />
-      case 'delivery': return <Truck className="h-4 w-4" />
-      case 'quality': return <Target className="h-4 w-4" />
-      case 'cost': return <TrendingDown className="h-4 w-4" />
-      default: return <AlertTriangle className="h-4 w-4" />
+      case "inventory":
+        return <Package className="h-4 w-4" />
+      case "sales":
+        return <DollarSign className="h-4 w-4" />
+      case "delivery":
+        return <Truck className="h-4 w-4" />
+      case "quality":
+        return <Target className="h-4 w-4" />
+      case "cost":
+        return <TrendingDown className="h-4 w-4" />
+      default:
+        return <AlertTriangle className="h-4 w-4" />
     }
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'new': return 'text-blue-600 bg-blue-100'
-      case 'investigating': return 'text-orange-600 bg-orange-100'
-      case 'resolved': return 'text-green-600 bg-green-100'
-      case 'false_positive': return 'text-gray-600 bg-gray-100'
-      default: return 'text-gray-600 bg-gray-100'
+      case "new":
+        return "text-blue-600 bg-blue-100"
+      case "investigating":
+        return "text-orange-600 bg-orange-100"
+      case "resolved":
+        return "text-green-600 bg-green-100"
+      case "false_positive":
+        return "text-gray-600 bg-gray-100"
+      default:
+        return "text-gray-600 bg-gray-100"
     }
   }
 
-  const filteredAlerts = selectedFilter === 'all' 
-    ? varianceAlerts 
-    : varianceAlerts.filter(alert => alert.type === selectedFilter)
+  const filteredAlerts =
+    selectedFilter === "all" ? varianceAlerts : varianceAlerts.filter((alert) => alert.type === selectedFilter)
 
   const totalVariances = varianceAlerts.length
-  const criticalVariances = varianceAlerts.filter(a => a.severity === 'critical').length
-  const resolvedVariances = varianceAlerts.filter(a => a.status === 'resolved').length
+  const criticalVariances = varianceAlerts.filter((a) => a.severity === "critical").length
+  const resolvedVariances = varianceAlerts.filter((a) => a.status === "resolved").length
   const avgConfidence = varianceAlerts.reduce((sum, alert) => sum + alert.aiConfidence, 0) / varianceAlerts.length
 
   const runAnalysis = async () => {
     setIsAnalyzing(true)
     // Simulate AI analysis
-    await new Promise(resolve => setTimeout(resolve, 3000))
+    await new Promise((resolve) => setTimeout(resolve, 3000))
     setIsAnalyzing(false)
     // In real implementation, this would trigger AI analysis
   }
@@ -183,12 +212,12 @@ export default function VarianceAnalysisPage() {
       <div className="max-w-7xl mx-auto p-6">
         {/* Breadcrumb */}
         <div className="mb-6">
-          <Breadcrumb 
+          <Breadcrumb
             items={[
-              { name: 'Dashboard', href: '/' },
-              { name: 'Analytics', href: '/analytics' },
-              { name: 'Variance Analysis' }
-            ]} 
+              { name: "Dashboard", href: "/" },
+              { name: "Analytics", href: "/analytics" },
+              { name: "Variance Analysis" },
+            ]}
           />
         </div>
 
@@ -202,19 +231,15 @@ export default function VarianceAnalysisPage() {
             <p className="text-gray-600 mt-2">Intelligent detection and analysis of operational variances</p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" className="flex items-center space-x-2">
+            <Button variant="outline" className="flex items-center space-x-2 bg-transparent">
               <Filter className="h-4 w-4" />
               <span>Filter</span>
             </Button>
-            <Button variant="outline" className="flex items-center space-x-2">
+            <Button variant="outline" className="flex items-center space-x-2 bg-transparent">
               <Download className="h-4 w-4" />
               <span>Export</span>
             </Button>
-            <Button 
-              onClick={runAnalysis}
-              disabled={isAnalyzing}
-              className="bg-purple-600 hover:bg-purple-700"
-            >
+            <Button onClick={runAnalysis} disabled={isAnalyzing} className="bg-purple-600 hover:bg-purple-700">
               {isAnalyzing ? (
                 <>
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -317,9 +342,7 @@ export default function VarianceAnalysisPage() {
                   <AlertTriangle className="h-5 w-5 text-red-600" />
                   <span>Variance Alerts</span>
                 </CardTitle>
-                <CardDescription>
-                  AI-detected anomalies and variances requiring attention
-                </CardDescription>
+                <CardDescription>AI-detected anomalies and variances requiring attention</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -334,9 +357,9 @@ export default function VarianceAnalysisPage() {
                               {alert.severity}
                             </span>
                           </div>
-                          
+
                           <p className="text-sm mb-3">{alert.description}</p>
-                          
+
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
                             <div>
                               <p className="text-xs font-medium">Current</p>
@@ -348,8 +371,9 @@ export default function VarianceAnalysisPage() {
                             </div>
                             <div>
                               <p className="text-xs font-medium">Variance</p>
-                              <p className={`font-semibold ${alert.variance < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                {alert.variancePercentage > 0 ? '+' : ''}{alert.variancePercentage}%
+                              <p className={`font-semibold ${alert.variance < 0 ? "text-red-600" : "text-green-600"}`}>
+                                {alert.variancePercentage > 0 ? "+" : ""}
+                                {alert.variancePercentage}%
                               </p>
                             </div>
                             <div>
@@ -381,7 +405,7 @@ export default function VarianceAnalysisPage() {
                               <span>Detected {alert.detectedAt.toLocaleTimeString()}</span>
                             </div>
                             <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(alert.status)}`}>
-                              {alert.status.replace('_', ' ')}
+                              {alert.status.replace("_", " ")}
                             </span>
                           </div>
                         </div>
@@ -417,9 +441,7 @@ export default function VarianceAnalysisPage() {
                   <TrendingUp className="h-5 w-5 text-blue-600" />
                   <span>Variance Trends</span>
                 </CardTitle>
-                <CardDescription>
-                  7-day variance detection trends
-                </CardDescription>
+                <CardDescription>7-day variance detection trends</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -446,9 +468,7 @@ export default function VarianceAnalysisPage() {
                   <Brain className="h-5 w-5 text-purple-600" />
                   <span>AI Insights</span>
                 </CardTitle>
-                <CardDescription>
-                  Machine learning recommendations
-                </CardDescription>
+                <CardDescription>Machine learning recommendations</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -458,14 +478,14 @@ export default function VarianceAnalysisPage() {
                       Temperature variances are 40% more common on Mondays. Consider adjusting delivery schedules.
                     </p>
                   </div>
-                  
+
                   <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                     <h4 className="font-semibold text-green-900 mb-1">Optimization</h4>
                     <p className="text-sm text-green-800">
                       Downtown Pub shows consistent return rate issues. Recommend equipment audit.
                     </p>
                   </div>
-                  
+
                   <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <h4 className="font-semibold text-yellow-900 mb-1">Prediction</h4>
                     <p className="text-sm text-yellow-800">
@@ -483,19 +503,19 @@ export default function VarianceAnalysisPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button className="w-full justify-start bg-transparent" variant="outline">
                     <BarChart3 className="h-4 w-4 mr-3" />
                     Generate Report
                   </Button>
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button className="w-full justify-start bg-transparent" variant="outline">
                     <Calendar className="h-4 w-4 mr-3" />
                     Schedule Analysis
                   </Button>
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button className="w-full justify-start bg-transparent" variant="outline">
                     <Brain className="h-4 w-4 mr-3" />
                     Train AI Model
                   </Button>
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button className="w-full justify-start bg-transparent" variant="outline">
                     <Target className="h-4 w-4 mr-3" />
                     Set Alerts
                   </Button>
