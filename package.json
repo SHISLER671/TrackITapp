@@ -9,14 +9,17 @@
     "start": "next start"
   },
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "latest",
     "@radix-ui/react-slot": "^1.1.0",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
-    "@thirdweb-dev/chains": "^0.1.120",
+    "@thirdweb-dev/chains": "latest",
     "@thirdweb-dev/react": "^4.9.4",
-    "@thirdweb-dev/sdk": "^4.0.99",
+    "@thirdweb-dev/sdk": "latest",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "ethers": "latest",
+    "ethers-aws-kms-signer": "latest",
     "html5-qrcode": "latest",
     "lucide-react": "^0.454.0",
     "next": "15.2.4",
@@ -26,7 +29,8 @@
     "react-dom": "^19",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "tw-animate-css": "latest"
+    "tw-animate-css": "latest",
+    "zksync-ethers": "latest"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
