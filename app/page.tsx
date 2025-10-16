@@ -157,6 +157,47 @@ export default function Home() {
                 </CardContent>
               </Card>
 
+              {/* Role-Specific Dashboards */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Building2 className="h-5 w-5 text-purple-600" />
+                    <span>Role Dashboards</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Access specialized views for different user roles
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Button 
+                      onClick={() => router.push('/dashboard/brewer')}
+                      className="h-24 flex flex-col items-center justify-center space-y-2 bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Package className="h-8 w-8" />
+                      <span className="font-semibold">Brewer Dashboard</span>
+                      <span className="text-xs opacity-90">Production & Inventory</span>
+                    </Button>
+                    <Button 
+                      onClick={() => router.push('/dashboard/driver')}
+                      className="h-24 flex flex-col items-center justify-center space-y-2 bg-green-600 hover:bg-green-700"
+                    >
+                      <Truck className="h-8 w-8" />
+                      <span className="font-semibold">Driver Dashboard</span>
+                      <span className="text-xs opacity-90">Deliveries & Routes</span>
+                    </Button>
+                    <Button 
+                      onClick={() => router.push('/dashboard/restaurant')}
+                      className="h-24 flex flex-col items-center justify-center space-y-2 bg-purple-600 hover:bg-purple-700"
+                    >
+                      <Building2 className="h-8 w-8" />
+                      <span className="font-semibold">Restaurant Dashboard</span>
+                      <span className="text-xs opacity-90">Inventory & Orders</span>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">

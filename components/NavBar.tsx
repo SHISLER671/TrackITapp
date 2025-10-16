@@ -49,6 +49,12 @@ export function NavBar() {
     { name: 'Reports', href: '/reports', icon: BarChart3 },
   ]
 
+  const roleDashboards = [
+    { name: 'Brewer', href: '/dashboard/brewer', icon: Package },
+    { name: 'Driver', href: '/dashboard/driver', icon: Truck },
+    { name: 'Restaurant', href: '/dashboard/restaurant', icon: Building2 },
+  ]
+
   const isActive = (href: string) => {
     if (href === '/') {
       return pathname === '/'
@@ -107,6 +113,34 @@ export function NavBar() {
                 </Link>
               )
             })}
+            
+            {/* Role Dashboards Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+                <Settings className="h-4 w-4" />
+                <span>Roles</span>
+              </button>
+              <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-1">
+                  {roleDashboards.map((dashboard) => {
+                    const Icon = dashboard.icon
+                    return (
+                      <Link
+                        key={dashboard.name}
+                        href={dashboard.href}
+                        className={cn(
+                          'flex items-center space-x-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors',
+                          isActive(dashboard.href) ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span>{dashboard.name} Dashboard</span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Right side - User menu and actions */}
@@ -203,6 +237,32 @@ export function NavBar() {
                   </Link>
                 )
               })}
+              
+              {/* Role Dashboards - Mobile */}
+              <div className="border-t pt-3 mt-3">
+                <p className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Role Dashboards
+                </p>
+                {roleDashboards.map((dashboard) => {
+                  const Icon = dashboard.icon
+                  return (
+                    <Link
+                      key={dashboard.name}
+                      href={dashboard.href}
+                      className={cn(
+                        'flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium transition-colors',
+                        isActive(dashboard.href)
+                          ? 'text-blue-600 bg-blue-50'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      )}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span>{dashboard.name} Dashboard</span>
+                    </Link>
+                  )
+                })}
+              </div>
               
               {user && (
                 <div className="border-t pt-3 mt-3">
