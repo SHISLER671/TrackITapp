@@ -1,106 +1,116 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
-import { Breadcrumb } from '@/components/NavBar'
-import { 
-  BarChart3, 
-  FileText, 
-  Download, 
+import { useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { AnalyticsDashboard } from "@/components/AnalyticsDashboard"
+import { Breadcrumb } from "@/components/NavBar"
+import {
+  BarChart3,
+  FileText,
+  Download,
   Calendar,
   Filter,
   TrendingUp,
   Package,
   Truck,
-  Building2,
   DollarSign,
   Clock,
-  Users
-} from 'lucide-react'
+  Users,
+  Eye,
+} from "lucide-react"
 
 interface ReportTemplate {
   id: string
   name: string
   description: string
   icon: any
-  category: 'inventory' | 'delivery' | 'financial' | 'performance'
-  frequency: 'daily' | 'weekly' | 'monthly' | 'custom'
+  category: "inventory" | "delivery" | "financial" | "performance"
+  frequency: "daily" | "weekly" | "monthly" | "custom"
 }
 
 export default function ReportsPage() {
   const [selectedReport, setSelectedReport] = useState<string | null>(null)
-  const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d')
+  const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "1y">("30d")
 
   const reportTemplates: ReportTemplate[] = [
     {
-      id: 'inventory-summary',
-      name: 'Inventory Summary',
-      description: 'Complete overview of keg inventory, status, and movements',
+      id: "inventory-summary",
+      name: "Inventory Summary",
+      description: "Complete overview of keg inventory, status, and movements",
       icon: Package,
-      category: 'inventory',
-      frequency: 'daily'
+      category: "inventory",
+      frequency: "daily",
     },
     {
-      id: 'delivery-performance',
-      name: 'Delivery Performance',
-      description: 'Delivery metrics, timing, and driver performance analysis',
+      id: "delivery-performance",
+      name: "Delivery Performance",
+      description: "Delivery metrics, timing, and driver performance analysis",
       icon: Truck,
-      category: 'delivery',
-      frequency: 'weekly'
+      category: "delivery",
+      frequency: "weekly",
     },
     {
-      id: 'financial-summary',
-      name: 'Financial Summary',
-      description: 'Revenue, costs, and profitability analysis',
+      id: "financial-summary",
+      name: "Financial Summary",
+      description: "Revenue, costs, and profitability analysis",
       icon: DollarSign,
-      category: 'financial',
-      frequency: 'monthly'
+      category: "financial",
+      frequency: "monthly",
     },
     {
-      id: 'customer-analytics',
-      name: 'Customer Analytics',
-      description: 'Customer behavior, preferences, and retention metrics',
+      id: "customer-analytics",
+      name: "Customer Analytics",
+      description: "Customer behavior, preferences, and retention metrics",
       icon: Users,
-      category: 'performance',
-      frequency: 'monthly'
+      category: "performance",
+      frequency: "monthly",
     },
     {
-      id: 'efficiency-report',
-      name: 'Efficiency Report',
-      description: 'Operational efficiency and optimization opportunities',
+      id: "efficiency-report",
+      name: "Efficiency Report",
+      description: "Operational efficiency and optimization opportunities",
       icon: TrendingUp,
-      category: 'performance',
-      frequency: 'weekly'
+      category: "performance",
+      frequency: "weekly",
     },
     {
-      id: 'compliance-report',
-      name: 'Compliance Report',
-      description: 'Regulatory compliance and audit trail documentation',
+      id: "compliance-report",
+      name: "Compliance Report",
+      description: "Regulatory compliance and audit trail documentation",
       icon: FileText,
-      category: 'performance',
-      frequency: 'monthly'
-    }
+      category: "performance",
+      frequency: "monthly",
+    },
   ]
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'inventory': return 'bg-blue-100 text-blue-600'
-      case 'delivery': return 'bg-green-100 text-green-600'
-      case 'financial': return 'bg-purple-100 text-purple-600'
-      case 'performance': return 'bg-orange-100 text-orange-600'
-      default: return 'bg-gray-100 text-gray-600'
+      case "inventory":
+        return "bg-blue-100 text-blue-600"
+      case "delivery":
+        return "bg-green-100 text-green-600"
+      case "financial":
+        return "bg-purple-100 text-purple-600"
+      case "performance":
+        return "bg-orange-100 text-orange-600"
+      default:
+        return "bg-gray-100 text-gray-600"
     }
   }
 
   const getFrequencyColor = (frequency: string) => {
     switch (frequency) {
-      case 'daily': return 'bg-green-100 text-green-800'
-      case 'weekly': return 'bg-blue-100 text-blue-800'
-      case 'monthly': return 'bg-purple-100 text-purple-800'
-      case 'custom': return 'bg-orange-100 text-orange-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case "daily":
+        return "bg-green-100 text-green-800"
+      case "weekly":
+        return "bg-blue-100 text-blue-800"
+      case "monthly":
+        return "bg-purple-100 text-purple-800"
+      case "custom":
+        return "bg-orange-100 text-orange-800"
+      default:
+        return "bg-gray-100 text-gray-800"
     }
   }
 
@@ -110,7 +120,7 @@ export default function ReportsPage() {
     console.log(`Generating report: ${reportId}`)
   }
 
-  const handleExportReport = (reportId: string, format: 'pdf' | 'csv' | 'excel') => {
+  const handleExportReport = (reportId: string, format: "pdf" | "csv" | "excel") => {
     // In a real app, this would export the report
     console.log(`Exporting report ${reportId} as ${format}`)
   }
@@ -120,12 +130,7 @@ export default function ReportsPage() {
       <div className="max-w-7xl mx-auto p-6">
         {/* Breadcrumb */}
         <div className="mb-6">
-          <Breadcrumb 
-            items={[
-              { name: 'Dashboard', href: '/' },
-              { name: 'Reports & Analytics' }
-            ]} 
-          />
+          <Breadcrumb items={[{ name: "Dashboard", href: "/" }, { name: "Reports & Analytics" }]} />
         </div>
 
         {/* Header */}
@@ -138,7 +143,7 @@ export default function ReportsPage() {
             <p className="text-gray-600 mt-2">Generate insights and track performance across your keg operations</p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" className="flex items-center space-x-2">
+            <Button variant="outline" className="flex items-center space-x-2 bg-transparent">
               <Filter className="h-4 w-4" />
               <span>Filter</span>
             </Button>
@@ -160,7 +165,7 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex gap-2">
-              {(['7d', '30d', '90d', '1y'] as const).map((period) => (
+              {(["7d", "30d", "90d", "1y"] as const).map((period) => (
                 <Button
                   key={period}
                   variant={dateRange === period ? "default" : "outline"}
@@ -168,10 +173,10 @@ export default function ReportsPage() {
                   onClick={() => setDateRange(period)}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
-                  {period === '7d' && 'Last 7 Days'}
-                  {period === '30d' && 'Last 30 Days'}
-                  {period === '90d' && 'Last 90 Days'}
-                  {period === '1y' && 'Last Year'}
+                  {period === "7d" && "Last 7 Days"}
+                  {period === "30d" && "Last 30 Days"}
+                  {period === "90d" && "Last 90 Days"}
+                  {period === "1y" && "Last Year"}
                 </Button>
               ))}
             </div>
@@ -192,9 +197,7 @@ export default function ReportsPage() {
                       </div>
                       <div>
                         <CardTitle className="text-lg">{template.name}</CardTitle>
-                        <CardDescription className="mt-1">
-                          {template.description}
-                        </CardDescription>
+                        <CardDescription className="mt-1">{template.description}</CardDescription>
                       </div>
                     </div>
                     <span className={`px-2 py-1 text-xs rounded-full ${getFrequencyColor(template.frequency)}`}>
@@ -210,21 +213,13 @@ export default function ReportsPage() {
                         {template.category}
                       </span>
                     </div>
-                    
+
                     <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        className="flex-1"
-                        onClick={() => handleGenerateReport(template.id)}
-                      >
+                      <Button size="sm" className="flex-1" onClick={() => handleGenerateReport(template.id)}>
                         <BarChart3 className="h-4 w-4 mr-2" />
                         Generate
                       </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => handleExportReport(template.id, 'pdf')}
-                      >
+                      <Button size="sm" variant="outline" onClick={() => handleExportReport(template.id, "pdf")}>
                         <Download className="h-4 w-4" />
                       </Button>
                     </div>
@@ -236,7 +231,7 @@ export default function ReportsPage() {
         </div>
 
         {/* Analytics Dashboard */}
-        {selectedReport === 'inventory-summary' && (
+        {selectedReport === "inventory-summary" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -318,19 +313,24 @@ export default function ReportsPage() {
           <CardContent>
             <div className="space-y-4">
               {[
-                { name: 'Inventory Summary - October 2024', type: 'PDF', date: '2024-10-15', size: '2.3 MB' },
-                { name: 'Delivery Performance Report', type: 'CSV', date: '2024-10-14', size: '1.8 MB' },
-                { name: 'Financial Summary Q3 2024', type: 'Excel', date: '2024-10-12', size: '4.1 MB' },
-                { name: 'Customer Analytics Report', type: 'PDF', date: '2024-10-10', size: '3.2 MB' }
+                { name: "Inventory Summary - October 2024", type: "PDF", date: "2024-10-15", size: "2.3 MB" },
+                { name: "Delivery Performance Report", type: "CSV", date: "2024-10-14", size: "1.8 MB" },
+                { name: "Financial Summary Q3 2024", type: "Excel", date: "2024-10-12", size: "4.1 MB" },
+                { name: "Customer Analytics Report", type: "PDF", date: "2024-10-10", size: "3.2 MB" },
               ].map((report, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                >
                   <div className="flex items-center space-x-4">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                       <FileText className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">{report.name}</h3>
-                      <p className="text-sm text-gray-600">{report.type} • {report.date} • {report.size}</p>
+                      <p className="text-sm text-gray-600">
+                        {report.type} • {report.date} • {report.size}
+                      </p>
                     </div>
                   </div>
                   <div className="flex gap-2">
