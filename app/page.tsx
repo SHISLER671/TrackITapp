@@ -57,23 +57,23 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center space-x-2">
               <span className="text-green-500">✅</span>
-              <span>QR Code scanning</span>
+              <span className="text-gray-700">QR Code scanning</span>
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-green-500">✅</span>
-              <span>Delivery tracking</span>
+              <span className="text-gray-700">Delivery tracking</span>
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-green-500">✅</span>
-              <span>Inventory management</span>
+              <span className="text-gray-700">Inventory management</span>
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-green-500">✅</span>
-              <span>Real-time updates</span>
+              <span className="text-gray-700">Real-time updates</span>
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-green-500">✅</span>
-              <span>Mobile-first design</span>
+              <span className="text-gray-700">Mobile-first design</span>
             </div>
           </div>
         </CardContent>
