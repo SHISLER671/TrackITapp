@@ -1,9 +1,11 @@
 import type { Metadata } from "next"
+import { AuthProvider } from "@/components/AuthProvider"
+import './globals.css'
 
 export const metadata: Metadata = {
   title: "Keg Tracker",
   description: "Track beer kegs across the supply chain",
-    generator: 'v0.app'
+  generator: 'v0.app'
 }
 
 export default function RootLayout({
@@ -13,10 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   )
 }
-
-
-import './globals.css'

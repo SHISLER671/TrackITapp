@@ -1,7 +1,34 @@
+'use client'
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/components/AuthProvider"
+import { useRouter } from "next/navigation"
 
 export default function Home() {
+  const { user, loading, supabaseConfigured } = useAuth()
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    if (supabaseConfigured) {
+      try {
+        const { createClient } = await import('@/lib/supabase/client')
+        const supabase = createClient()
+        await supabase.auth.signOut()
+        router.refresh()
+      } catch (error) {
+        console.error('Sign out error:', error)
+      }
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
+      </div>
+    )
+  }
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="text-center mb-8">
@@ -11,6 +38,12 @@ export default function Home() {
         <p className="text-xl text-gray-600 max-w-2xl">
           Track beer kegs across the supply chain from brewery to restaurant
         </p>
+        {user && (
+          <div className="mt-4 p-4 bg-white rounded-lg shadow-sm">
+            <p className="text-sm text-gray-600">Welcome back,</p>
+            <p className="font-semibold text-gray-800">{user.email}</p>
+          </div>
+        )}
       </div>
       
       <Card className="w-full max-w-2xl mb-8">
@@ -47,12 +80,29 @@ export default function Home() {
       </Card>
 
       <div className="flex flex-col sm:flex-row gap-4">
-        <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-          Get Started
-        </Button>
-        <Button variant="outline" size="lg">
-          Learn More
-        </Button>
+        {user ? (
+          <Button 
+            onClick={handleSignOut}
+            variant="outline" 
+            size="lg"
+            className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+          >
+            Sign Out
+          </Button>
+        ) : (
+          <>
+            <Button 
+              size="lg" 
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={() => router.push('/login')}
+            >
+              Get Started
+            </Button>
+            <Button variant="outline" size="lg">
+              Learn More
+            </Button>
+          </>
+        )}
       </div>
 
       <div className="mt-8 text-center text-sm text-gray-500">
