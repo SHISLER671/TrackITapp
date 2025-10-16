@@ -6,9 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { QRScanner } from '@/components/QRScanner'
 import { QRCodeDisplay } from '@/components/QRCodeDisplay'
 import { BlockchainStatus } from '@/components/BlockchainStatus'
+import { KegCard } from '@/components/KegCard'
+import { Breadcrumb } from '@/components/NavBar'
 import { useAuth } from '@/components/AuthProvider'
 import { Keg } from '@/lib/types'
-import { Plus, Search, Package, MapPin, Shield } from 'lucide-react'
+import { Plus, Search, Package, MapPin, Shield, Filter } from 'lucide-react'
 import Link from 'next/link'
 
 export default function KegsPage() {
@@ -77,23 +79,37 @@ export default function KegsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Breadcrumb */}
+        <div className="mb-6">
+          <Breadcrumb 
+            items={[
+              { name: 'Dashboard', href: '/' },
+              { name: 'Kegs' }
+            ]} 
+          />
+        </div>
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Keg Management</h1>
-            <p className="text-gray-600 mt-1">Track and manage your beer kegs</p>
+            <h1 className="text-4xl font-bold text-gray-900">Keg Management</h1>
+            <p className="text-gray-600 mt-2">Track and manage all your beer kegs across the supply chain.</p>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={() => setShowScanner(true)}>
-              <Search className="h-4 w-4 mr-2" />
-              Scan QR Code
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => setShowScanner(true)} className="flex items-center space-x-2">
+              <Search className="h-4 w-4" />
+              <span>Scan QR</span>
             </Button>
-            <Button asChild>
+            <Button onClick={fetchKegs} variant="outline" className="flex items-center space-x-2">
+              <Package className="h-4 w-4" />
+              <span>Refresh</span>
+            </Button>
+            <Button asChild className="bg-blue-600 hover:bg-blue-700">
               <Link href="/kegs/new">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Keg
+                New Keg
               </Link>
             </Button>
           </div>
@@ -152,82 +168,48 @@ export default function KegsPage() {
           </Card>
         </div>
 
-        {/* Kegs List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Kegs Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {loading ? (
-            Array.from({ length: 6 }).map((_, i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3"></div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="h-3 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-3 bg-gray-200 rounded animate-pulse w-1/2"></div>
-                  </div>
-                </CardContent>
-              </Card>
+            Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-lg border p-6 animate-pulse">
+                <div className="h-6 bg-gray-200 rounded mb-4"></div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                  <div className="h-8 bg-gray-200 rounded mt-4"></div>
+                </div>
+              </div>
             ))
           ) : kegs.length === 0 ? (
-            <div className="col-span-full text-center py-12">
-              <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No kegs found</h3>
-              <p className="text-gray-600 mb-4">Get started by adding your first keg</p>
-              <Button asChild>
+            <div className="col-span-full text-center py-16">
+              <Package className="h-16 w-16 text-gray-400 mx-auto mb-6" />
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">No kegs found</h3>
+              <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                Get started by adding your first keg to begin tracking your inventory
+              </p>
+              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
                 <Link href="/kegs/new">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-5 w-5 mr-2" />
                   Add First Keg
                 </Link>
               </Button>
             </div>
           ) : (
             kegs.map((keg) => (
-              <Card key={keg.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>{keg.name}</span>
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      keg.status === 'active' ? 'bg-green-100 text-green-800' :
-                      keg.status === 'delivered' ? 'bg-blue-100 text-blue-800' :
-                      keg.status === 'returned' ? 'bg-orange-100 text-orange-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {keg.status}
-                    </span>
-                  </CardTitle>
-                  <CardDescription>{keg.type} • {keg.size}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-600">
-                        <strong>ABV:</strong> {keg.abv || 'N/A'}%
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        <strong>QR Code:</strong> {keg.qr_code.slice(-8)}...
-                      </p>
-                    </div>
-                    
-                    {/* Blockchain Status */}
-                    <div className="border-t pt-2">
-                      <BlockchainStatus 
-                        keg={keg as any} 
-                        className="!shadow-none !border-0 !p-0"
-                      />
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => setSelectedKeg(keg)}
-                    >
-                      View Details
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <KegCard
+                key={keg.id}
+                keg={keg}
+                showProgress={true}
+                showBlockchain={true}
+                showVariance={false}
+                onViewDetails={(keg) => setSelectedKeg(keg)}
+                onScan={(keg) => {
+                  // Handle scan action
+                  console.log('Scan keg:', keg)
+                }}
+                className="h-fit"
+              />
             ))
           )}
         </div>
