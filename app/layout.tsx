@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
 import { AuthProvider } from "@/components/AuthProvider"
+import { AIChatAssistant } from "@/components/AIChatAssistant"
+import { AIVoiceAssistant } from "@/components/AIVoiceAssistant"
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -18,6 +20,8 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           {children}
+          <AIChatAssistant />
+          <AIVoiceAssistant />
         </AuthProvider>
       </body>
     </html>
