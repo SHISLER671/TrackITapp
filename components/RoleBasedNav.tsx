@@ -73,6 +73,8 @@ export function RoleBasedNav() {
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
       await supabase.auth.signOut()
+      // Clear local state
+      setUserProfile(null)
       router.push('/')
       router.refresh()
     } catch (error) {
