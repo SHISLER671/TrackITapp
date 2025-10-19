@@ -1,33 +1,40 @@
 -- Fix infinite recursion in user_profiles RLS policies
 -- The issue occurs when policies reference the same table they're protecting
 
--- Drop existing policies that might cause recursion
-DROP POLICY IF EXISTS "Users can view their own profile" ON user_profiles;
-DROP POLICY IF EXISTS "Users can update their own profile" ON user_profiles;
-DROP POLICY IF EXISTS "Admins can view all profiles" ON user_profiles;
-DROP POLICY IF EXISTS "Admins can update all profiles" ON user_profiles;
+-- Ensure RLS is enabled first
+ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
 
--- Create simple, non-recursive policies
+-- Drop ALL existing policies that might cause recursion (using exact names)
+DROP POLICY IF EXISTS "Users can view own profile" ON public.user_profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.user_profiles;
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.user_profiles;
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.user_profiles;
+DROP POLICY IF EXISTS "Admins can view all profiles" ON public.user_profiles;
+DROP POLICY IF EXISTS "Admins can update all profiles" ON public.user_profiles;
+DROP POLICY IF EXISTS "Admins can view all user profiles" ON public.user_profiles;
+DROP POLICY IF EXISTS "Admins can manage user roles" ON public.user_profiles;
+DROP POLICY IF EXISTS "Admins can create user profiles" ON public.user_profiles;
+DROP POLICY IF EXISTS "Service role full access" ON public.user_profiles;
+
+-- Create simple, non-recursive policies using SELECT auth.uid() for plan stability
 -- Policy 1: Users can view their own profile (no recursion)
 CREATE POLICY "Users can view own profile"
-ON user_profiles
+ON public.user_profiles
 FOR SELECT
-USING (auth.uid() = id);
+USING ((SELECT auth.uid()) = id);
 
 -- Policy 2: Users can update their own profile (no recursion)
 CREATE POLICY "Users can update own profile"
-ON user_profiles
+ON public.user_profiles
 FOR UPDATE
-USING (auth.uid() = id);
+USING ((SELECT auth.uid()) = id)
+WITH CHECK ((SELECT auth.uid()) = id);
 
 -- Policy 3: Service role can do everything (for admin operations)
 CREATE POLICY "Service role full access"
-ON user_profiles
+ON public.user_profiles
 FOR ALL
-USING (auth.jwt() ->> 'role' = 'service_role');
-
--- Ensure RLS is enabled
-ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+USING ((auth.jwt() ->> 'role') = 'service_role');
 
 -- Create or replace the admin_user_management view without recursion
 DROP VIEW IF EXISTS admin_user_management;
