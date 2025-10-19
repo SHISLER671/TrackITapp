@@ -38,7 +38,7 @@ export default function Home() {
           .from("user_profiles")
           .select("id, email, full_name, role, brewery_id, restaurant_id")
           .eq("id", user.id)
-          .single()
+          .maybeSingle()
 
         if (error) {
           console.error("Error fetching user profile:", error)
@@ -104,17 +104,17 @@ export default function Home() {
     if (userProfile.role !== "admin") {
       // Redirect non-admin users to their role-specific dashboard
       switch (userProfile.role) {
-        case 'brewer':
-          router.push('/dashboard/brewer')
+        case "brewer":
+          router.push("/dashboard/brewer")
           break
-        case 'driver':
-          router.push('/dashboard/driver')
+        case "driver":
+          router.push("/dashboard/driver")
           break
-        case 'restaurant_manager':
-          router.push('/dashboard/restaurant')
+        case "restaurant_manager":
+          router.push("/dashboard/restaurant")
           break
         default:
-          router.push('/dashboard/restaurant')
+          router.push("/dashboard/restaurant")
       }
       return (
         <div className="min-h-screen flex items-center justify-center">
@@ -128,12 +128,8 @@ export default function Home() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-xl mb-4">Account Pending Approval</div>
-          <div className="text-gray-600 mb-4">
-            Your account is being reviewed by an administrator.
-          </div>
-          <div className="text-sm text-gray-500">
-            You'll receive access once your role is assigned.
-          </div>
+          <div className="text-gray-600 mb-4">Your account is being reviewed by an administrator.</div>
+          <div className="text-sm text-gray-500">You'll receive access once your role is assigned.</div>
         </div>
       </div>
     )

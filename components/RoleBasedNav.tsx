@@ -1,32 +1,18 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { useAuth } from '@/components/AuthProvider'
-import { 
-  Package, 
-  Truck, 
-  Building2, 
-  User, 
-  LogOut, 
-  Menu, 
-  X,
-  Home,
-  BarChart3,
-  Settings,
-  Bell,
-  Search,
-  QrCode
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import Link from 'next/link'
+import { useState, useEffect } from "react"
+import { useRouter, usePathname } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { useAuth } from "@/components/AuthProvider"
+import { Package, Truck, Building2, User, LogOut, Menu, X, Home, BarChart3, Settings, Search } from "lucide-react"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 interface UserProfile {
   id: string
   email: string
   full_name: string
-  role: 'brewer' | 'driver' | 'restaurant_manager' | 'admin'
+  role: "brewer" | "driver" | "restaurant_manager" | "admin"
   brewery_id?: string
   restaurant_id?: string
 }
@@ -41,25 +27,21 @@ export function RoleBasedNav() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!supabaseConfigured || !user) return
-      
+
       try {
-        const { createClient } = await import('@/lib/supabase/client')
+        const { createClient } = await import("@/lib/supabase/client")
         const supabase = createClient()
-        
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single()
-        
+
+        const { data, error } = await supabase.from("user_profiles").select("*").eq("id", user.id).maybeSingle()
+
         if (error) {
-          console.error('Error fetching user profile:', error)
+          console.error("Error fetching user profile:", error)
           return
         }
-        
+
         setUserProfile(data)
       } catch (error) {
-        console.error('Error:', error)
+        console.error("Error:", error)
       }
     }
 
@@ -68,17 +50,17 @@ export function RoleBasedNav() {
 
   const handleSignOut = async () => {
     if (!supabaseConfigured) return
-    
+
     try {
-      const { createClient } = await import('@/lib/supabase/client')
+      const { createClient } = await import("@/lib/supabase/client")
       const supabase = createClient()
       await supabase.auth.signOut()
       // Clear local state
       setUserProfile(null)
-      router.push('/')
+      router.push("/")
       router.refresh()
     } catch (error) {
-      console.error('Sign out error:', error)
+      console.error("Sign out error:", error)
     }
   }
 
@@ -86,45 +68,45 @@ export function RoleBasedNav() {
     if (!userProfile) return []
 
     const baseNav = [
-      { name: 'Dashboard', href: '/', icon: Home },
-      { name: 'Scan', href: '/scan', icon: Search },
+      { name: "Dashboard", href: "/", icon: Home },
+      { name: "Scan", href: "/scan", icon: Search },
     ]
 
     switch (userProfile.role) {
-      case 'brewer':
+      case "brewer":
         return [
           ...baseNav,
-          { name: 'Kegs', href: '/kegs', icon: Package },
-          { name: 'Deliveries', href: '/deliveries', icon: Truck },
-          { name: 'Reports', href: '/reports', icon: BarChart3 },
+          { name: "Kegs", href: "/kegs", icon: Package },
+          { name: "Deliveries", href: "/deliveries", icon: Truck },
+          { name: "Reports", href: "/reports", icon: BarChart3 },
         ]
-      
-      case 'driver':
+
+      case "driver":
         return [
           ...baseNav,
-          { name: 'Deliveries', href: '/deliveries', icon: Truck },
-          { name: 'Routes', href: '/routes', icon: Settings },
+          { name: "Deliveries", href: "/deliveries", icon: Truck },
+          { name: "Routes", href: "/routes", icon: Settings },
         ]
-      
-      case 'restaurant_manager':
+
+      case "restaurant_manager":
         return [
           ...baseNav,
-          { name: 'Inventory', href: '/dashboard/restaurant', icon: Building2 },
-          { name: 'Orders', href: '/orders', icon: Package },
-          { name: 'Reports', href: '/reports', icon: BarChart3 },
+          { name: "Inventory", href: "/dashboard/restaurant", icon: Building2 },
+          { name: "Orders", href: "/orders", icon: Package },
+          { name: "Reports", href: "/reports", icon: BarChart3 },
         ]
-      
-      case 'admin':
+
+      case "admin":
         return [
           ...baseNav,
-          { name: 'Kegs', href: '/kegs', icon: Package },
-          { name: 'Deliveries', href: '/deliveries', icon: Truck },
-          { name: 'Restaurants', href: '/restaurants', icon: Building2 },
-          { name: 'Users', href: '/admin/users', icon: User },
-          { name: 'Reports', href: '/reports', icon: BarChart3 },
-          { name: 'Settings', href: '/settings', icon: Settings },
+          { name: "Kegs", href: "/kegs", icon: Package },
+          { name: "Deliveries", href: "/deliveries", icon: Truck },
+          { name: "Restaurants", href: "/restaurants", icon: Building2 },
+          { name: "Users", href: "/admin/users", icon: User },
+          { name: "Reports", href: "/reports", icon: BarChart3 },
+          { name: "Settings", href: "/settings", icon: Settings },
         ]
-      
+
       default:
         return baseNav
     }
@@ -132,11 +114,16 @@ export function RoleBasedNav() {
 
   const getRoleDisplayName = (role: string) => {
     switch (role) {
-      case 'brewer': return 'Brewer'
-      case 'driver': return 'Driver'
-      case 'restaurant_manager': return 'Restaurant Manager'
-      case 'admin': return 'Administrator'
-      default: return 'User'
+      case "brewer":
+        return "Brewer"
+      case "driver":
+        return "Driver"
+      case "restaurant_manager":
+        return "Restaurant Manager"
+      case "admin":
+        return "Administrator"
+      default:
+        return "User"
     }
   }
 
@@ -177,10 +164,10 @@ export function RoleBasedNav() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  'flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                  "flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                   pathname === item.href
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    ? "bg-blue-100 text-blue-700"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100",
                 )}
               >
                 <item.icon className="h-4 w-4" />
@@ -204,24 +191,14 @@ export function RoleBasedNav() {
                 </div>
               </div>
             )}
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSignOut}
-              className="text-gray-600 hover:text-gray-900"
-            >
+
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-gray-600 hover:text-gray-900">
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
             </Button>
 
             {/* Mobile menu button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
+            <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
@@ -236,10 +213,10 @@ export function RoleBasedNav() {
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                    "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                     pathname === item.href
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      ? "bg-blue-100 text-blue-700"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100",
                   )}
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -248,7 +225,7 @@ export function RoleBasedNav() {
                 </Link>
               ))}
             </div>
-            
+
             {userProfile && (
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <div className="flex items-center space-x-3">

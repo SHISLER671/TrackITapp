@@ -1,14 +1,22 @@
+import type React from "react"
 import type { Metadata } from "next"
 import { AuthProvider } from "@/components/AuthProvider"
 import { RoleBasedNav } from "@/components/RoleBasedNav"
 import { AIChatAssistant } from "@/components/AIChatAssistant"
 import { AIVoiceAssistant } from "@/components/AIVoiceAssistant"
-import './globals.css'
+import { Plus_Jakarta_Sans } from "next/font/google"
+import "./globals.css"
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   title: "Keg Tracker",
   description: "Track beer kegs across the supply chain",
-  generator: 'v0.app'
+  generator: "v0.app",
 }
 
 export default function RootLayout({
@@ -18,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className={plusJakartaSans.className}>
         <AuthProvider>
           <RoleBasedNav />
           {children}
