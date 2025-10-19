@@ -8,14 +8,12 @@ import { Breadcrumb } from '@/components/NavBar'
 import { 
   Package, 
   Truck, 
-  TrendingUp, 
   AlertTriangle, 
   Plus, 
   Eye, 
   BarChart3,
   Factory,
   Calendar,
-  MapPin,
   Zap
 } from 'lucide-react'
 import Link from 'next/link'
@@ -57,7 +55,6 @@ export default function BrewerDashboard() {
       abv: 6.5,
       qr_code: 'KT-2024-001',
       created_at: new Date().toISOString(),
-      fill_level: 85,
       nft_token_id: '123',
       blockchain_status: 'MINTED'
     },
@@ -70,7 +67,6 @@ export default function BrewerDashboard() {
       abv: 7.2,
       qr_code: 'KT-2024-002',
       created_at: new Date().toISOString(),
-      fill_level: 45,
       variance_percent: 12,
       variance_severity: 'warning',
       nft_token_id: '124',
@@ -144,14 +140,13 @@ export default function BrewerDashboard() {
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-sm">Total Kegs</p>
                   <p className="text-3xl font-bold">{stats.totalKegs}</p>
-                  <p className="text-blue-200 text-xs mt-1">+12% from last month</p>
                 </div>
                 <Package className="h-8 w-8 text-blue-200" />
               </div>
@@ -164,7 +159,6 @@ export default function BrewerDashboard() {
                 <div>
                   <p className="text-green-100 text-sm">Active Kegs</p>
                   <p className="text-3xl font-bold">{stats.activeKegs}</p>
-                  <p className="text-green-200 text-xs mt-1">Ready for delivery</p>
                 </div>
                 <Zap className="h-8 w-8 text-green-200" />
               </div>
@@ -177,22 +171,8 @@ export default function BrewerDashboard() {
                 <div>
                   <p className="text-orange-100 text-sm">Pending Deliveries</p>
                   <p className="text-3xl font-bold">{stats.pendingDeliveries}</p>
-                  <p className="text-orange-200 text-xs mt-1">Scheduled this week</p>
                 </div>
                 <Truck className="h-8 w-8 text-orange-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm">Production Efficiency</p>
-                  <p className="text-3xl font-bold">{stats.efficiency}%</p>
-                  <p className="text-purple-200 text-xs mt-1">+3% from last week</p>
-                </div>
-                <TrendingUp className="h-8 w-8 text-purple-200" />
               </div>
             </CardContent>
           </Card>
@@ -228,7 +208,6 @@ export default function BrewerDashboard() {
                     <KegCard
                       key={keg.id}
                       keg={keg}
-                      showProgress={true}
                       showBlockchain={true}
                       showVariance={true}
                       onViewDetails={() => console.log('View details:', keg)}

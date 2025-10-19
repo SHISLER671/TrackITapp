@@ -3,20 +3,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/StatusBadge'
-import { ProgressBar } from '@/components/ProgressBar'
 import { BlockchainStatus } from '@/components/BlockchainStatus'
 import { VarianceAlertCompact } from '@/components/VarianceAlert'
 import { QRCodeDisplay } from '@/components/QRCodeDisplay'
 import { 
   Package, 
-  MapPin, 
   Calendar, 
   Zap, 
   Eye, 
-  QrCode,
-  AlertTriangle,
-  TrendingUp,
-  TrendingDown
+  QrCode
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
@@ -35,11 +30,9 @@ interface KegCardProps {
     nft_token_id?: string
     nft_tx_hash?: string
     blockchain_status?: string
-    fill_level?: number
     variance_percent?: number
     variance_severity?: 'normal' | 'warning' | 'critical'
   }
-  showProgress?: boolean
   showBlockchain?: boolean
   showVariance?: boolean
   onViewDetails?: (keg: any) => void
@@ -50,7 +43,6 @@ interface KegCardProps {
 
 export function KegCard({
   keg,
-  showProgress = true,
   showBlockchain = true,
   showVariance = false,
   onViewDetails,
@@ -76,7 +68,6 @@ export function KegCard({
   }
 
   const sizeInfo = getKegSizeInfo(keg.size)
-  const fillLevel = keg.fill_level || 75 // Default fill level
   const hasVariance = showVariance && keg.variance_severity && keg.variance_severity !== 'normal'
 
   return (
@@ -104,44 +95,14 @@ export function KegCard({
 
         <CardContent className="space-y-4">
           {/* Key Stats */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-50 rounded-lg p-3">
-              <div className="flex items-center space-x-2">
-                <Package className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">ABV</span>
-              </div>
-              <p className="text-lg font-bold text-gray-800 mt-1">
-                {keg.abv ? `${keg.abv}%` : 'N/A'}
-              </p>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-3">
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">Created</span>
-              </div>
-              <p className="text-sm font-semibold text-gray-800 mt-1">
-                {new Date(keg.created_at).toLocaleDateString()}
-              </p>
+          <div className="flex items-center justify-between text-sm text-gray-600">
+            <div className="flex items-center space-x-4">
+              <span>ABV: {keg.abv ? `${keg.abv}%` : 'N/A'}</span>
+              <span>•</span>
+              <span>{new Date(keg.created_at).toLocaleDateString()}</span>
             </div>
           </div>
 
-          {/* Fill Level Progress */}
-          {showProgress && (
-            <div>
-              <ProgressBar
-                value={fillLevel}
-                max={100}
-                size="md"
-                label="Fill Level"
-                showLabel={true}
-                color="default"
-              />
-              <p className="text-xs text-gray-500 mt-1 text-center">
-                ~{Math.round((fillLevel / 100) * sizeInfo.pints)} pints remaining
-              </p>
-            </div>
-          )}
 
           {/* Variance Alert */}
           {showVariance && hasVariance && (
@@ -164,15 +125,10 @@ export function KegCard({
           )}
 
           {/* QR Code Info */}
-          <div className="bg-blue-50 rounded-lg p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <QrCode className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-800">QR Code</span>
-              </div>
-              <span className="font-mono text-xs text-blue-600">
-                {keg.qr_code.slice(-8)}...
-              </span>
+          <div className="flex items-center justify-between text-sm text-gray-600">
+            <div className="flex items-center space-x-2">
+              <QrCode className="h-4 w-4" />
+              <span>QR: {keg.qr_code.slice(-8)}...</span>
             </div>
           </div>
 

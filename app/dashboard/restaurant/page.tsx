@@ -26,7 +26,6 @@ interface InventoryItem {
   type: string
   size: string
   status: string
-  fillLevel: number
   daysRemaining: number
   lastDelivery: string
   priority: 'low' | 'medium' | 'high'
@@ -48,7 +47,6 @@ export default function RestaurantDashboard() {
       type: 'IPA',
       size: 'Half Barrel',
       status: 'active',
-      fillLevel: 25,
       daysRemaining: 2,
       lastDelivery: '2024-10-10',
       priority: 'high'
@@ -59,7 +57,6 @@ export default function RestaurantDashboard() {
       type: 'Porter',
       size: 'Quarter Barrel',
       status: 'active',
-      fillLevel: 60,
       daysRemaining: 5,
       lastDelivery: '2024-10-08',
       priority: 'medium'
@@ -70,7 +67,6 @@ export default function RestaurantDashboard() {
       type: 'Wheat',
       size: 'Sixth Barrel',
       status: 'active',
-      fillLevel: 80,
       daysRemaining: 7,
       lastDelivery: '2024-10-05',
       priority: 'low'

@@ -10,17 +10,7 @@ import {
   Clock, 
   Package, 
   User, 
-  Calendar,
-  Plus,
-  Eye,
-  Edit,
-  Trash2,
-  CheckCircle,
-  AlertCircle,
-  Navigation,
-  BarChart3,
-  Filter,
-  Download
+  CheckCircle
 } from 'lucide-react'
 
 interface Delivery {
@@ -205,23 +195,9 @@ export default function DeliveriesPage() {
           <div>
             <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
               <Truck className="h-10 w-10 text-green-600" />
-              Delivery Management
+              Deliveries
             </h1>
-            <p className="text-gray-600 mt-2">Track and manage keg deliveries across your supply chain</p>
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" className="flex items-center space-x-2">
-              <Filter className="h-4 w-4" />
-              <span>Filter</span>
-            </Button>
-            <Button variant="outline" className="flex items-center space-x-2">
-              <Download className="h-4 w-4" />
-              <span>Export</span>
-            </Button>
-            <Button className="bg-green-600 hover:bg-green-700">
-              <Plus className="h-4 w-4 mr-2" />
-              New Delivery
-            </Button>
+            <p className="text-gray-600 mt-2">Track keg deliveries and handoffs</p>
           </div>
         </div>
 
@@ -233,7 +209,6 @@ export default function DeliveriesPage() {
                 <div>
                   <p className="text-blue-100 text-sm">Total Deliveries</p>
                   <p className="text-3xl font-bold">{deliveries.length}</p>
-                  <p className="text-blue-200 text-xs mt-1">this week</p>
                 </div>
                 <Truck className="h-8 w-8 text-blue-200" />
               </div>
@@ -246,7 +221,6 @@ export default function DeliveriesPage() {
                 <div>
                   <p className="text-green-100 text-sm">Completed</p>
                   <p className="text-3xl font-bold">{completedDeliveries}</p>
-                  <p className="text-green-200 text-xs mt-1">on time</p>
                 </div>
                 <CheckCircle className="h-8 w-8 text-green-200" />
               </div>
@@ -259,7 +233,6 @@ export default function DeliveriesPage() {
                 <div>
                   <p className="text-orange-100 text-sm">In Progress</p>
                   <p className="text-3xl font-bold">{inProgressDeliveries}</p>
-                  <p className="text-orange-200 text-xs mt-1">active</p>
                 </div>
                 <Clock className="h-8 w-8 text-orange-200" />
               </div>
@@ -272,7 +245,6 @@ export default function DeliveriesPage() {
                 <div>
                   <p className="text-purple-100 text-sm">Total Kegs</p>
                   <p className="text-3xl font-bold">{totalKegs}</p>
-                  <p className="text-purple-200 text-xs mt-1">in delivery</p>
                 </div>
                 <Package className="h-8 w-8 text-purple-200" />
               </div>
@@ -328,7 +300,7 @@ export default function DeliveriesPage() {
                   <span>Active Deliveries</span>
                 </CardTitle>
                 <CardDescription>
-                  Manage and track your delivery operations
+                  Current delivery status and tracking
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -393,26 +365,6 @@ export default function DeliveriesPage() {
                         </div>
                       </div>
 
-                      <div className="flex gap-2 mt-4">
-                        <Button size="sm" variant="outline">
-                          <Eye className="h-3 w-3 mr-1" />
-                          View
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Edit className="h-3 w-3 mr-1" />
-                          Edit
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Navigation className="h-3 w-3 mr-1" />
-                          Route
-                        </Button>
-                        {delivery.status === 'pending' && (
-                          <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Assign
-                          </Button>
-                        )}
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -461,35 +413,6 @@ export default function DeliveriesPage() {
               </CardContent>
             </Card>
 
-            {/* Quick Actions */}
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <BarChart3 className="h-5 w-5 text-purple-600" />
-                  <span>Quick Actions</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <Button className="w-full justify-start" variant="outline">
-                    <Plus className="h-4 w-4 mr-3" />
-                    Schedule Delivery
-                  </Button>
-                  <Button className="w-full justify-start" variant="outline">
-                    <Navigation className="h-4 w-4 mr-3" />
-                    Optimize Routes
-                  </Button>
-                  <Button className="w-full justify-start" variant="outline">
-                    <BarChart3 className="h-4 w-4 mr-3" />
-                    Delivery Analytics
-                  </Button>
-                  <Button className="w-full justify-start" variant="outline">
-                    <User className="h-4 w-4 mr-3" />
-                    Manage Drivers
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>

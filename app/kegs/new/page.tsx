@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { CreateKegFormData, BeerStyle, KegSize } from '@/lib/types'
 import { ArrowLeft, Save } from 'lucide-react'
 import Link from 'next/link'
-import { AIRecommendations } from '@/components/AIRecommendations'
 
 export default function NewKegPage() {
   const router = useRouter()
@@ -102,15 +101,6 @@ export default function NewKegPage() {
     }))
   }
 
-  const handleApplyRecommendation = (recommendation: any) => {
-    setFormData(prev => ({
-      ...prev,
-      name: recommendation.title || prev.name,
-      type: recommendation.beerStyle || prev.type,
-      abv: recommendation.abv || prev.abv,
-      size: recommendation.kegSize || prev.size,
-    }))
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -128,13 +118,6 @@ export default function NewKegPage() {
           </div>
         </div>
 
-        {/* AI Recommendations */}
-        <div className="mb-6">
-          <AIRecommendations 
-            onApply={handleApplyRecommendation}
-            className="w-full"
-          />
-        </div>
 
         {/* Form */}
         <Card>

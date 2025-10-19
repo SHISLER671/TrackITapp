@@ -46,7 +46,7 @@ export function NavBar() {
     { name: 'Scan', href: '/scan', icon: Search },
     { name: 'Kegs', href: '/kegs', icon: Package },
     { name: 'Deliveries', href: '/deliveries', icon: Truck },
-    { name: 'Restaurants', href: '/restaurants', icon: Building2 },
+    { name: 'Restaurants', href: '/dashboard/restaurant', icon: Building2 },
     { name: 'Reports', href: '/reports', icon: BarChart3 },
     { name: 'Integrations', href: '/integrations/pos', icon: Settings },
   ]
