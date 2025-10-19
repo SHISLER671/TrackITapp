@@ -100,10 +100,41 @@ export default function Home() {
 
   // If user has a specific role, they should be redirected
   // This page is mainly for admins or users without roles
-  if (userProfile && userProfile.role !== "admin") {
+  if (userProfile) {
+    if (userProfile.role !== "admin") {
+      // Redirect non-admin users to their role-specific dashboard
+      switch (userProfile.role) {
+        case 'brewer':
+          router.push('/dashboard/brewer')
+          break
+        case 'driver':
+          router.push('/dashboard/driver')
+          break
+        case 'restaurant_manager':
+          router.push('/dashboard/restaurant')
+          break
+        default:
+          router.push('/dashboard/restaurant')
+      }
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-xl">Redirecting to your dashboard...</div>
+        </div>
+      )
+    }
+  } else if (user && !profileLoading) {
+    // User is logged in but has no profile - they're pending
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Redirecting to your dashboard...</div>
+        <div className="text-center">
+          <div className="text-xl mb-4">Account Pending Approval</div>
+          <div className="text-gray-600 mb-4">
+            Your account is being reviewed by an administrator.
+          </div>
+          <div className="text-sm text-gray-500">
+            You'll receive access once your role is assigned.
+          </div>
+        </div>
       </div>
     )
   }
