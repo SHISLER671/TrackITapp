@@ -126,7 +126,7 @@ SET status = 'active',
 WHERE email = 'admin@test.com';
 
 -- Create a view for admin user management
-CREATE OR REPLACE VIEW admin_user_management AS
+CREATE OR REPLACE VIEW public.admin_user_management AS
 SELECT 
   up.id,
   up.email,
@@ -147,13 +147,6 @@ FROM user_profiles up
 LEFT JOIN auth.users au ON up.id = au.id
 ORDER BY up.created_at DESC;
 
--- Grant access to the view for admins only
-CREATE POLICY "Admins can view user management" ON admin_user_management
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM user_profiles 
-      WHERE id = auth.uid() 
-      AND role = 'admin'
-      AND status = 'active'
-    )
-  );
+-- Grant access to the view for authenticated users
+-- The RLS policy on user_profiles will control access
+GRANT SELECT ON public.admin_user_management TO authenticated;
