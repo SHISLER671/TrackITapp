@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { KegCardCompact } from "@/components/KegCard"
 import { useAuth } from "@/components/AuthProvider"
 import { useRouter } from "next/navigation"
-import { Package, Truck, Building2, BarChart3, TrendingUp, AlertTriangle, Search, Settings } from "lucide-react"
+import { Package, Truck, Building2, BarChart3, TrendingUp, AlertTriangle, Search, Settings, Users } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface UserProfile {

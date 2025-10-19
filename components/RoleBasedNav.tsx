@@ -118,6 +118,7 @@ export function RoleBasedNav() {
           { name: 'Kegs', href: '/kegs', icon: Package },
           { name: 'Deliveries', href: '/deliveries', icon: Truck },
           { name: 'Restaurants', href: '/restaurants', icon: Building2 },
+          { name: 'Users', href: '/admin/users', icon: User },
           { name: 'Reports', href: '/reports', icon: BarChart3 },
           { name: 'Settings', href: '/settings', icon: Settings },
         ]
