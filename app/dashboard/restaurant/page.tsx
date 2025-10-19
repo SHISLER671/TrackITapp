@@ -9,7 +9,6 @@ import {
   Building2, 
   Package, 
   ShoppingCart, 
-  TrendingDown, 
   AlertTriangle, 
   Clock,
   CheckCircle,
@@ -17,37 +16,51 @@ import {
   Calendar,
   BarChart3,
   QrCode,
-  RefreshCw
+  RefreshCw,
+  Truck,
+  Eye,
+  Scan
 } from 'lucide-react'
 
-interface InventoryItem {
+interface KegInventory {
   id: string
   name: string
   type: string
   size: string
-  status: string
-  daysRemaining: number
+  fullKegs: number
+  emptyKegs: number
+  qrCode: string
+  nftTokenId?: string
   lastDelivery: string
   priority: 'low' | 'medium' | 'high'
 }
 
-interface OrderHistory {
+interface DeliveryRecord {
   id: string
   date: string
-  items: string[]
-  status: 'pending' | 'confirmed' | 'delivered'
+  driver: string
+  items: Array<{
+    name: string
+    type: string
+    size: string
+    quantity: number
+    qrCode: string
+  }>
+  status: 'delivered' | 'scanned' | 'accepted'
   total: number
 }
 
 export default function RestaurantDashboard() {
-  const [inventory, setInventory] = useState<InventoryItem[]>([
+  const [inventory, setInventory] = useState<KegInventory[]>([
     {
       id: '1',
       name: 'Summer IPA',
       type: 'IPA',
       size: 'Half Barrel',
-      status: 'active',
-      daysRemaining: 2,
+      fullKegs: 3,
+      emptyKegs: 1,
+      qrCode: 'KT-2024-001',
+      nftTokenId: '123',
       lastDelivery: '2024-10-10',
       priority: 'high'
     },
@@ -56,8 +69,10 @@ export default function RestaurantDashboard() {
       name: 'Dark Porter',
       type: 'Porter',
       size: 'Quarter Barrel',
-      status: 'active',
-      daysRemaining: 5,
+      fullKegs: 2,
+      emptyKegs: 0,
+      qrCode: 'KT-2024-002',
+      nftTokenId: '124',
       lastDelivery: '2024-10-08',
       priority: 'medium'
     },
@@ -66,43 +81,56 @@ export default function RestaurantDashboard() {
       name: 'Wheat Beer',
       type: 'Wheat',
       size: 'Sixth Barrel',
-      status: 'active',
-      daysRemaining: 7,
+      fullKegs: 1,
+      emptyKegs: 2,
+      qrCode: 'KT-2024-003',
+      nftTokenId: '125',
       lastDelivery: '2024-10-05',
       priority: 'low'
     }
   ])
 
-  const [recentOrders] = useState<OrderHistory[]>([
+  const [deliveries] = useState<DeliveryRecord[]>([
     {
       id: '1',
       date: '2024-10-14',
-      items: ['Summer IPA (2x Half Barrel)', 'Dark Porter (1x Quarter Barrel)'],
-      status: 'delivered',
+      driver: 'John Smith',
+      items: [
+        { name: 'Summer IPA', type: 'IPA', size: 'Half Barrel', quantity: 2, qrCode: 'KT-2024-001' },
+        { name: 'Dark Porter', type: 'Porter', size: 'Quarter Barrel', quantity: 1, qrCode: 'KT-2024-002' }
+      ],
+      status: 'accepted',
       total: 450
     },
     {
       id: '2',
       date: '2024-10-12',
-      items: ['Wheat Beer (1x Sixth Barrel)', 'Summer IPA (1x Half Barrel)'],
-      status: 'delivered',
+      driver: 'Sarah Johnson',
+      items: [
+        { name: 'Wheat Beer', type: 'Wheat', size: 'Sixth Barrel', quantity: 1, qrCode: 'KT-2024-003' },
+        { name: 'Summer IPA', type: 'IPA', size: 'Half Barrel', quantity: 1, qrCode: 'KT-2024-001' }
+      ],
+      status: 'accepted',
       total: 380
     },
     {
       id: '3',
       date: '2024-10-15',
-      items: ['Summer IPA (3x Half Barrel)', 'Dark Porter (2x Quarter Barrel)'],
-      status: 'confirmed',
+      driver: 'Mike Wilson',
+      items: [
+        { name: 'Summer IPA', type: 'IPA', size: 'Half Barrel', quantity: 3, qrCode: 'KT-2024-001' },
+        { name: 'Dark Porter', type: 'Porter', size: 'Quarter Barrel', quantity: 2, qrCode: 'KT-2024-002' }
+      ],
+      status: 'delivered',
       total: 650
     }
   ])
 
   const [stats] = useState({
-    totalKegs: 12,
-    lowStock: 3,
-    pendingOrders: 1,
-    monthlySpend: 2450,
-    efficiency: 88
+    totalFullKegs: inventory.reduce((sum, item) => sum + item.fullKegs, 0),
+    totalEmptyKegs: inventory.reduce((sum, item) => sum + item.emptyKegs, 0),
+    pendingDeliveries: deliveries.filter(d => d.status === 'delivered').length,
+    monthlySpend: 2450
   })
 
   const getPriorityColor = (priority: string) => {
@@ -158,28 +186,28 @@ export default function RestaurantDashboard() {
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm">Total Kegs</p>
-                  <p className="text-3xl font-bold">{stats.totalKegs}</p>
-                  <p className="text-purple-200 text-xs mt-1">in inventory</p>
+                  <p className="text-green-100 text-sm">Full Kegs</p>
+                  <p className="text-3xl font-bold">{stats.totalFullKegs}</p>
+                  <p className="text-green-200 text-xs mt-1">ready to serve</p>
                 </div>
-                <Package className="h-8 w-8 text-purple-200" />
+                <Package className="h-8 w-8 text-green-200" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white">
+          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-red-100 text-sm">Low Stock</p>
-                  <p className="text-3xl font-bold">{stats.lowStock}</p>
-                  <p className="text-red-200 text-xs mt-1">need reorder</p>
+                  <p className="text-orange-100 text-sm">Empty Kegs</p>
+                  <p className="text-3xl font-bold">{stats.totalEmptyKegs}</p>
+                  <p className="text-orange-200 text-xs mt-1">ready for pickup</p>
                 </div>
-                <AlertTriangle className="h-8 w-8 text-red-200" />
+                <Truck className="h-8 w-8 text-orange-200" />
               </div>
             </CardContent>
           </Card>
@@ -188,24 +216,49 @@ export default function RestaurantDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm">Pending Orders</p>
-                  <p className="text-3xl font-bold">{stats.pendingOrders}</p>
-                  <p className="text-blue-200 text-xs mt-1">awaiting delivery</p>
+                  <p className="text-blue-100 text-sm">Pending Scans</p>
+                  <p className="text-3xl font-bold">{stats.pendingDeliveries}</p>
+                  <p className="text-blue-200 text-xs mt-1">awaiting acceptance</p>
                 </div>
-                <Clock className="h-8 w-8 text-blue-200" />
+                <QrCode className="h-8 w-8 text-blue-200" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-100 text-sm">Monthly Spend</p>
+                  <p className="text-purple-100 text-sm">Monthly Spend</p>
                   <p className="text-3xl font-bold">${stats.monthlySpend}</p>
-                  <p className="text-green-200 text-xs mt-1">this month</p>
+                  <p className="text-purple-200 text-xs mt-1">this month</p>
                 </div>
-                <TrendingDown className="h-8 w-8 text-green-200" />
+                <BarChart3 className="h-8 w-8 text-purple-200" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Mobile QR Scanner - Hidden on desktop */}
+        <div className="lg:hidden mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Scan className="h-5 w-5 text-green-600" />
+                <span>QR Scanner</span>
+              </CardTitle>
+              <CardDescription>
+                Scan keg QR codes to accept deliveries
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-gray-100 rounded-lg p-8 text-center">
+                <QrCode className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-600 mb-4">Point camera at QR code to scan</p>
+                <Button className="bg-green-600 hover:bg-green-700">
+                  <Scan className="h-4 w-4 mr-2" />
+                  Start Scanning
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -213,25 +266,17 @@ export default function RestaurantDashboard() {
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Current Inventory */}
+          {/* Keg Inventory */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Package className="h-5 w-5 text-purple-600" />
-                      <span>Current Inventory</span>
-                    </CardTitle>
-                    <CardDescription>
-                      Track keg levels and reorder needs
-                    </CardDescription>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Refresh
-                  </Button>
-                </div>
+                <CardTitle className="flex items-center space-x-2">
+                  <Package className="h-5 w-5 text-purple-600" />
+                  <span>Keg Inventory</span>
+                </CardTitle>
+                <CardDescription>
+                  Track full and empty kegs by type
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -239,36 +284,36 @@ export default function RestaurantDashboard() {
                     <div key={item.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
+                          <div className="flex items-center gap-3 mb-3">
                             <div>
                               <h3 className="font-semibold text-gray-900">{item.name}</h3>
                               <p className="text-sm text-gray-600">{item.type} • {item.size}</p>
                             </div>
                           </div>
                           
-                          <div className="flex items-center gap-6 mt-3">
-                            <div className="flex items-center gap-2">
-                              <Package className="h-4 w-4 text-gray-500" />
-                              <span className="text-sm text-gray-600">{item.fillLevel}% full</span>
+                          <div className="grid grid-cols-2 gap-4 mb-3">
+                            <div className="bg-green-50 rounded-lg p-3">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Package className="h-4 w-4 text-green-600" />
+                                <span className="text-sm font-medium text-green-800">Full Kegs</span>
+                              </div>
+                              <p className="text-2xl font-bold text-green-900">{item.fullKegs}</p>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-gray-500" />
-                              <span className="text-sm text-gray-600">{item.daysRemaining} days left</span>
+                            <div className="bg-orange-50 rounded-lg p-3">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Truck className="h-4 w-4 text-orange-600" />
+                                <span className="text-sm font-medium text-orange-800">Empty Kegs</span>
+                              </div>
+                              <p className="text-2xl font-bold text-orange-900">{item.emptyKegs}</p>
                             </div>
                           </div>
 
-                          {/* Fill Level Bar */}
-                          <div className="mt-3">
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
-                                className={`h-2 rounded-full ${
-                                  item.fillLevel < 30 ? 'bg-red-500' :
-                                  item.fillLevel < 60 ? 'bg-yellow-500' :
-                                  'bg-green-500'
-                                }`}
-                                style={{ width: `${item.fillLevel}%` }}
-                              ></div>
+                          <div className="flex items-center justify-between text-sm text-gray-600">
+                            <div className="flex items-center gap-2">
+                              <QrCode className="h-4 w-4" />
+                              <span>QR: {item.qrCode}</span>
                             </div>
+                            <span>Last delivery: {item.lastDelivery}</span>
                           </div>
                         </div>
 
@@ -276,7 +321,7 @@ export default function RestaurantDashboard() {
                           <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(item.priority)}`}>
                             {item.priority} priority
                           </span>
-                          {item.fillLevel < 30 && (
+                          {item.fullKegs === 0 && (
                             <Button size="sm" className="bg-red-600 hover:bg-red-700">
                               Reorder
                             </Button>
@@ -290,68 +335,74 @@ export default function RestaurantDashboard() {
             </Card>
           </div>
 
-          {/* Order Management */}
+          {/* Desktop QR Scanner & Delivery History */}
           <div>
-            <Card>
+            {/* Desktop QR Scanner - Hidden on mobile */}
+            <Card className="hidden lg:block mb-6">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <ShoppingCart className="h-5 w-5 text-blue-600" />
-                  <span>Recent Orders</span>
+                  <Scan className="h-5 w-5 text-green-600" />
+                  <span>QR Scanner</span>
                 </CardTitle>
                 <CardDescription>
-                  Latest orders and deliveries
+                  Scan keg QR codes to accept deliveries
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {recentOrders.map((order) => (
-                    <div key={order.id} className="border rounded-lg p-3">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">Order #{order.id}</p>
-                          <p className="text-xs text-gray-600">{order.date}</p>
-                        </div>
-                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(order.status)}`}>
-                          {order.status}
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        {order.items.map((item, index) => (
-                          <p key={index} className="text-xs text-gray-600">• {item}</p>
-                        ))}
-                      </div>
-                      <p className="text-sm font-semibold text-gray-900 mt-2">${order.total}</p>
-                    </div>
-                  ))}
+                <div className="bg-gray-100 rounded-lg p-6 text-center">
+                  <QrCode className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                  <p className="text-sm text-gray-600 mb-3">Point camera at QR code</p>
+                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                    <Scan className="h-4 w-4 mr-2" />
+                    Start Scanning
+                  </Button>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="mt-6">
+            {/* Delivery History */}
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Phone className="h-5 w-5 text-green-600" />
-                  <span>Quick Actions</span>
+                  <Truck className="h-5 w-5 text-blue-600" />
+                  <span>Recent Deliveries</span>
                 </CardTitle>
+                <CardDescription>
+                  Delivery history and QR scan records
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <Button className="w-full justify-start" variant="outline">
-                    <ShoppingCart className="h-4 w-4 mr-3" />
-                    Place New Order
-                  </Button>
-                  <Button className="w-full justify-start" variant="outline">
-                    <QrCode className="h-4 w-4 mr-3" />
-                    Scan Keg QR
-                  </Button>
-                  <Button className="w-full justify-start" variant="outline">
-                    <Phone className="h-4 w-4 mr-3" />
-                    Contact Supplier
-                  </Button>
-                  <Button className="w-full justify-start" variant="outline">
-                    <BarChart3 className="h-4 w-4 mr-3" />
-                    View Analytics
-                  </Button>
+                <div className="space-y-4">
+                  {deliveries.map((delivery) => (
+                    <div key={delivery.id} className="border rounded-lg p-3">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Delivery #{delivery.id}</p>
+                          <p className="text-xs text-gray-600">{delivery.date} • {delivery.driver}</p>
+                        </div>
+                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(delivery.status)}`}>
+                          {delivery.status}
+                        </span>
+                      </div>
+                      <div className="space-y-1 mb-2">
+                        {delivery.items.map((item, index) => (
+                          <div key={index} className="flex items-center justify-between text-xs text-gray-600">
+                            <span>• {item.quantity}x {item.name}</span>
+                            <span className="font-mono">QR: {item.qrCode.slice(-6)}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-semibold text-gray-900">${delivery.total}</p>
+                        {delivery.status === 'delivered' && (
+                          <Button size="sm" variant="outline">
+                            <Eye className="h-3 w-3 mr-1" />
+                            View
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -374,33 +425,35 @@ export default function RestaurantDashboard() {
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <AlertTriangle className="h-4 w-4 text-red-600" />
-                  <span className="font-medium text-red-800">Low Stock Alert</span>
+                  <span className="font-medium text-red-800">Empty Keg Alert</span>
                 </div>
-                <p className="text-sm text-red-700">Summer IPA running low - 2 days remaining</p>
+                <p className="text-sm text-red-700">3 empty kegs ready for pickup - schedule collection</p>
                 <Button size="sm" className="mt-2 bg-red-600 hover:bg-red-700">
-                  Reorder Now
+                  Schedule Pickup
                 </Button>
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock className="h-4 w-4 text-blue-600" />
-                  <span className="font-medium text-blue-800">Delivery Scheduled</span>
+                  <QrCode className="h-4 w-4 text-blue-600" />
+                  <span className="font-medium text-blue-800">Pending Scan</span>
                 </div>
-                <p className="text-sm text-blue-700">Order #3 confirmed for tomorrow 2:00 PM</p>
+                <p className="text-sm text-blue-700">Delivery #3 arrived - scan QR codes to accept</p>
                 <Button size="sm" variant="outline" className="mt-2">
-                  View Details
+                  <Scan className="h-3 w-3 mr-1" />
+                  Scan Now
                 </Button>
               </div>
 
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="font-medium text-green-800">Inventory Updated</span>
+                  <span className="font-medium text-green-800">NFT Verified</span>
                 </div>
-                <p className="text-sm text-green-700">Wheat Beer keg levels updated after delivery</p>
+                <p className="text-sm text-green-700">All kegs blockchain verified - ownership confirmed</p>
                 <Button size="sm" variant="outline" className="mt-2">
-                  View Inventory
+                  <Eye className="h-3 w-3 mr-1" />
+                  View Details
                 </Button>
               </div>
             </div>

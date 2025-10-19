@@ -5,11 +5,77 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { KegCardCompact } from "@/components/KegCard"
 import { useAuth } from "@/components/AuthProvider"
 import { useRouter } from "next/navigation"
-import { Package, Truck, Building2, BarChart3, TrendingUp, AlertTriangle, Search } from "lucide-react"
+import { Package, Truck, Building2, BarChart3, TrendingUp, AlertTriangle, Search, Settings } from "lucide-react"
+import { useEffect, useState } from "react"
+
+interface UserProfile {
+  id: string
+  email: string
+  full_name: string
+  role: 'brewer' | 'driver' | 'restaurant_manager' | 'admin'
+  brewery_id?: string
+  restaurant_id?: string
+}
 
 export default function Home() {
   const { user, loading, supabaseConfigured } = useAuth()
   const router = useRouter()
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [profileLoading, setProfileLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!supabaseConfigured || !user) {
+        setProfileLoading(false)
+        return
+      }
+      
+      try {
+        const { createClient } = await import('@/lib/supabase/client')
+        const supabase = createClient()
+        
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        
+        if (error) {
+          console.error('Error fetching user profile:', error)
+          setProfileLoading(false)
+          return
+        }
+        
+        setUserProfile(data)
+        setProfileLoading(false)
+
+        // Redirect to role-specific dashboard
+        if (data) {
+          switch (data.role) {
+            case 'brewer':
+              router.push('/dashboard/brewer')
+              break
+            case 'driver':
+              router.push('/dashboard/driver')
+              break
+            case 'restaurant_manager':
+              router.push('/dashboard/restaurant')
+              break
+            case 'admin':
+              // Admin stays on main dashboard
+              break
+            default:
+              router.push('/dashboard/restaurant')
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error)
+        setProfileLoading(false)
+      }
+    }
+
+    fetchUserProfile()
+  }, [user, supabaseConfigured, router])
 
   const handleSignOut = async () => {
     if (supabaseConfigured) {
@@ -24,10 +90,20 @@ export default function Home() {
     }
   }
 
-  if (loading) {
-  return (
+  if (loading || profileLoading) {
+    return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-xl">Loading...</div>
+      </div>
+    )
+  }
+
+  // If user has a specific role, they should be redirected
+  // This page is mainly for admins or users without roles
+  if (userProfile && userProfile.role !== 'admin') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Redirecting to your dashboard...</div>
       </div>
     )
   }
@@ -37,21 +113,21 @@ export default function Home() {
             {/* Hero Section */}
             <div className="text-center mb-12">
               <h1 className="text-5xl font-bold text-gray-900 mb-4">
-                🍺 Keg Tracker
+                🍺 Keg Tracker Admin
               </h1>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                Professional keg tracking and inventory management across the entire supply chain
+                System overview and administration for keg tracking across the entire supply chain
               </p>
-              {user && (
+              {userProfile && (
                 <div className="inline-flex items-center space-x-2 bg-white px-6 py-3 rounded-lg shadow-sm border">
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-semibold">
-                      {user.email?.charAt(0).toUpperCase()}
+                      {userProfile.full_name?.charAt(0).toUpperCase() || userProfile.email?.charAt(0).toUpperCase()}
                     </span>
                   </div>
                   <div className="text-left">
-                    <p className="text-sm text-gray-600">Welcome back</p>
-                    <p className="font-semibold text-gray-800">{user.email}</p>
+                    <p className="text-sm text-gray-600">Administrator</p>
+                    <p className="font-semibold text-gray-800">{userProfile.full_name || userProfile.email}</p>
                   </div>
                 </div>
               )}
@@ -156,42 +232,42 @@ export default function Home() {
                 </CardContent>
               </Card>
 
-              {/* Role-Specific Dashboards */}
+              {/* System Management */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Building2 className="h-5 w-5 text-purple-600" />
-                    <span>Role Dashboards</span>
+                    <span>System Management</span>
                   </CardTitle>
                   <CardDescription>
-                    Access specialized views for different user roles
+                    Administrative tools and system overview
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Button 
-                      onClick={() => router.push('/dashboard/brewer')}
+                      onClick={() => router.push('/users')}
                       className="h-24 flex flex-col items-center justify-center space-y-2 bg-blue-600 hover:bg-blue-700"
                     >
-                      <Package className="h-8 w-8" />
-                      <span className="font-semibold">Brewer Dashboard</span>
-                      <span className="text-xs opacity-90">Production & Inventory</span>
+                      <Building2 className="h-8 w-8" />
+                      <span className="font-semibold">User Management</span>
+                      <span className="text-xs opacity-90">Manage roles & access</span>
                     </Button>
                     <Button 
-                      onClick={() => router.push('/dashboard/driver')}
+                      onClick={() => router.push('/system')}
                       className="h-24 flex flex-col items-center justify-center space-y-2 bg-green-600 hover:bg-green-700"
                     >
-                      <Truck className="h-8 w-8" />
-                      <span className="font-semibold">Driver Dashboard</span>
-                      <span className="text-xs opacity-90">Deliveries & Routes</span>
+                      <BarChart3 className="h-8 w-8" />
+                      <span className="font-semibold">System Analytics</span>
+                      <span className="text-xs opacity-90">Performance & metrics</span>
                     </Button>
                     <Button 
-                      onClick={() => router.push('/dashboard/restaurant')}
+                      onClick={() => router.push('/settings')}
                       className="h-24 flex flex-col items-center justify-center space-y-2 bg-purple-600 hover:bg-purple-700"
                     >
-                      <Building2 className="h-8 w-8" />
-                      <span className="font-semibold">Restaurant Dashboard</span>
-                      <span className="text-xs opacity-90">Inventory & Orders</span>
+                      <Settings className="h-8 w-8" />
+                      <span className="font-semibold">System Settings</span>
+                      <span className="text-xs opacity-90">Configuration</span>
                     </Button>
                   </div>
                 </CardContent>

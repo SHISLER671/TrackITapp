@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { AuthProvider } from "@/components/AuthProvider"
-import { NavBar } from "@/components/NavBar"
+import { RoleBasedNav } from "@/components/RoleBasedNav"
 import { AIChatAssistant } from "@/components/AIChatAssistant"
 import { AIVoiceAssistant } from "@/components/AIVoiceAssistant"
 import './globals.css'
@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          <NavBar />
+          <RoleBasedNav />
           {children}
           <AIChatAssistant />
           <AIVoiceAssistant />
