@@ -4,7 +4,6 @@ import { AuthProvider } from "@/components/AuthProvider"
 import { RoleBasedNav } from "@/components/RoleBasedNav"
 import { AIChatAssistant } from "@/components/AIChatAssistant"
 import { AIVoiceAssistant } from "@/components/AIVoiceAssistant"
-import { KeepAlivePing } from "@/components/KeepAlivePing"
 import { Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 
@@ -30,7 +29,6 @@ export default function RootLayout({
       <body className={plusJakartaSans.className}>
         <AuthProvider>
           <RoleBasedNav />
-          <KeepAlivePing />
           {children}
           <AIChatAssistant />
           <AIVoiceAssistant />
