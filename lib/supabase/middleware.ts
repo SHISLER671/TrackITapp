@@ -30,9 +30,17 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
+  // TEMPORARY: Set to true to bypass authentication for demo
+  const BYPASS_AUTH = true;
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
+  // TEMPORARY: Bypass auth redirect for demo
+  if (BYPASS_AUTH) {
+    return supabaseResponse
+  }
 
   if (
     !user &&
