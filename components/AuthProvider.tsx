@@ -26,31 +26,12 @@ export const useAuth = () => {
   return context
 }
 
-// TEMPORARY: Set to true to bypass authentication for demo
-const BYPASS_AUTH = true;
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [supabaseConfigured, setSupabaseConfigured] = useState(false)
 
   useEffect(() => {
-    // TEMPORARY: Bypass authentication for demo
-    if (BYPASS_AUTH) {
-      // Mock user for demo
-      setUser({
-        id: 'demo-user-id',
-        email: 'demo@example.com',
-        app_metadata: {},
-        user_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-      } as User)
-      setSupabaseConfigured(false)
-      setLoading(false)
-      return
-    }
-
     // Check if Supabase is configured
     const hasSupabaseConfig = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
@@ -65,6 +46,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const supabase = createClient()
 
+      // Get initial session
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setUser(session?.user ?? null)
+        setLoading(false)
+      })
+
+      // Listen for auth changes
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {

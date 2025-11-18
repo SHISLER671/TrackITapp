@@ -17,9 +17,6 @@ interface UserProfile {
   restaurant_id?: string
 }
 
-// TEMPORARY: Set to true to bypass authentication for demo
-const BYPASS_AUTH = true;
-
 export default function Home() {
   const { user, loading, supabaseConfigured } = useAuth()
   const router = useRouter()
@@ -27,12 +24,6 @@ export default function Home() {
   const [profileLoading, setProfileLoading] = useState(true)
 
   useEffect(() => {
-    // TEMPORARY: Bypass auth and redirect to brewer dashboard for demo
-    if (BYPASS_AUTH) {
-      router.push('/dashboard/brewer')
-      return
-    }
-
     const fetchUserProfile = async () => {
       if (!supabaseConfigured || !user) {
         setProfileLoading(false)
